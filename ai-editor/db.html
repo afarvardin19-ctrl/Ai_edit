@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📊 دیتابیس کاربران</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #ff6b35, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        .subtitle {
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .btn-refresh {
+            background: linear-gradient(135deg, #ff6b35, #ff8c00);
+            color: #fff;
+        }
+        .btn-refresh:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.15);
+            color: #ff6b6b;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+        .btn-danger:hover {
+            background: rgba(255, 0, 0, 0.25);
+        }
+        .stats {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            margin-left: auto;
+        }
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: rgba(255, 107, 53, 0.06);
+            color: #ff8c00;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 12px 14px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td {
+            padding: 10px 14px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .badge {
+            background: rgba(255, 215, 0, 0.08);
+            color: #ffd700;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        .code-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            padding: 2px 10px;
+            font-family: monospace;
+            color: #ff8c00;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255, 255, 255, 0.15);
+        }
+        .empty .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .error-msg {
+            background: rgba(255, 0, 0, 0.04);
+            border: 1px solid rgba(255, 0, 0, 0.06);
+            border-radius: 8px;
+            padding: 12px;
+            color: #ff6b6b;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            .code-box {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 دیتابیس کاربران</h1>
+        <div class="subtitle">لیست تمام کاربرانی که ثبت‌نام کرده‌اند</div>
+
+        <div class="toolbar">
+            <button class="btn btn-refresh" onclick="loadUsers()">🔄 بارگذاری</button>
+            <span class="stats" id="stats">👥 در حال بارگذاری...</span>
+        </div>
+
+        <div class="table-wrapper">
+            <div id="userTable">
+                <div class="loading">⏳ در حال دریافت اطلاعات...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadUsers() {
+            const stats = document.getElementById('stats');
+            const tableDiv = document.getElementById('userTable');
+            
+            stats.textContent = '⏳ در حال بارگذاری...';
+            tableDiv.innerHTML = '<div class="loading">⏳ در حال دریافت اطلاعات...</div>';
+
+            try {
+                const res = await fetch('/api/users');
+                
+                if (!res.ok) {
+                    throw new Error(`خطای ${res.status}: ${res.statusText}`);
+                }
+                
+                const data = await res.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    stats.textContent = '👤 ۰ کاربر';
+                    tableDiv.innerHTML = `
+                        <div class="empty">
+                            <span class="icon">📭</span>
+                            هنوز هیچ کاربری ثبت‌نام نکرده
+                        </div>
+                    `;
+                    return;
+                }
+
+                stats.textContent = `👥 ${data.length} کاربر`;
+
+                let html = `<table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>📧 ایمیل</th>
+                            <th>🪙 سکه</th>
+                            <th>🔗 کد معرف</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                data.forEach((user, index) => {
+                    const email = user.email || '---';
+                    const coins = user.coins ?? 10;
+                    const refCode = user.referralCode || '---';
+                    
+                    html += `<tr>
+                        <td>${index + 1}</td>
+                        <td><span class="code-box">${email}</span></td>
+                        <td><span class="badge">${coins} 🪙</span></td>
+                        <td><span class="code-box">${refCode}</span></td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deleteUser('${email}')">🗑️</button>
+                        </td>
+                    </tr>`;
+                });
+
+                html += `</tbody></table>`;
+                tableDiv.innerHTML = html;
+
+            } catch (err) {
+                stats.textContent = '❌ خطا';
+                tableDiv.innerHTML = `
+                    <div class="error-msg">
+                        ❌ خطا در ارتباط با سرور: ${err.message}
+                        <br><br>
+                        <button class="btn btn-refresh" onclick="loadUsers()">🔄 تلاش مجدد</button>
+                    </div>
+                `;
+                console.error('❌ خطا:', err);
+            }
+        }
+
+        async function deleteUser(email) {
+            if (!confirm(`🗑️ کاربر "${email}" رو حذف کنم؟`)) return;
+
+            try {
+                const res = await fetch(`/api/user/${email}`, { method: 'DELETE' });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    alert('✅ کاربر با موفقیت حذف شد');
+                    loadUsers();
+                } else {
+                    alert('❌ خطا: ' + (data.error || 'مشخص نیست'));
+                }
+            } catch (err) {
+                alert('❌ خطا: ' + err.message);
+            }
+        }
+
+        // بارگذاری اولیه
+        loadUsers();
+    </script>
+</body>
+</html>

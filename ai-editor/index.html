@@ -1,1215 +1,1097 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Photo Editor — Pixlr Style</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
-    font-family: 'Inter', sans-serif;
-    background: #0a0a0f;
-    color: #fff;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-/* ===== BACKGROUND GLOW ===== */
-.bg-glow {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(150px);
-    pointer-events: none;
-    z-index: 0;
-}
-.bg-glow-1 {
-    width: 700px;
-    height: 700px;
-    background: rgba(255, 107, 53, 0.08);
-    top: -300px;
-    left: -200px;
-}
-.bg-glow-2 {
-    width: 600px;
-    height: 600px;
-    background: rgba(255, 140, 0, 0.06);
-    bottom: -250px;
-    right: -150px;
-}
-.bg-glow-3 {
-    width: 400px;
-    height: 400px;
-    background: rgba(255, 107, 53, 0.04);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-/* ===== HEADER ===== */
-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 32px;
-    background: rgba(10, 10, 15, 0.75);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    flex-wrap: wrap;
-    gap: 12px;
-}
-.logo {
-    font-size: 24px;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.logo span {
-    background: linear-gradient(135deg, #ff6b35, #ff8c00);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.logo .dot {
-    color: #ff6b35;
-    -webkit-text-fill-color: #ff6b35;
-}
-.nav-left {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-}
-.nav-left a {
-    color: rgba(255, 255, 255, 0.5);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: 0.3s;
-}
-.nav-left a:hover {
-    color: #fff;
-}
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.btn-outline {
-    padding: 8px 20px;
-    border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: transparent;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.btn-outline:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #fff;
-}
-.btn-orange {
-    padding: 8px 24px;
-    border-radius: 50px;
-    border: none;
-    background: linear-gradient(135deg, #ff6b35, #ff8c00);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.2);
-}
-.btn-orange:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 40px rgba(255, 107, 53, 0.3);
-}
-
-/* ===== COIN DISPLAY ===== */
-.coin-display {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 215, 0, 0.06);
-    border: 1px solid rgba(255, 215, 0, 0.08);
-    border-radius: 50px;
-    padding: 6px 14px 6px 8px;
-    cursor: default;
-}
-.coin-display .coin-icon {
-    font-size: 18px;
-}
-.coin-display .coin-count {
-    color: #ffd700;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-/* ===== REFERRAL DISPLAY ===== */
-.referral-display {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 107, 53, 0.04);
-    border: 1px solid rgba(255, 107, 53, 0.06);
-    border-radius: 50px;
-    padding: 4px 12px 4px 14px;
-    cursor: default;
-}
-.referral-display.show {
-    display: flex;
-}
-.referral-display .ref-label {
-    color: rgba(255, 255, 255, 0.2);
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.referral-display .ref-code {
-    color: #ff8c00;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-.referral-display .ref-copy {
-    background: rgba(255, 255, 255, 0.04);
-    border: none;
-    color: rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    padding: 2px 8px;
-    border-radius: 30px;
-    font-size: 11px;
-    transition: 0.3s;
-}
-.referral-display .ref-copy:hover {
-    background: rgba(255, 107, 53, 0.06);
-    color: #fff;
-}
-.referral-display .ref-copy.copied {
-    color: #ffd700;
-}
-
-/* ===== HERO ===== */
-.hero {
-    text-align: center;
-    padding: 60px 20px 30px;
-    position: relative;
-    z-index: 1;
-}
-.hero h1 {
-    font-size: 56px;
-    font-weight: 900;
-    line-height: 1.1;
-    letter-spacing: -1px;
-    background: linear-gradient(135deg, #fff 0%, #ff6b35 45%, #ff8c00 70%, #fff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.hero p {
-    color: rgba(255, 255, 255, 0.35);
-    font-size: 18px;
-    margin-top: 14px;
-    max-width: 540px;
-    margin-left: auto;
-    margin-right: auto;
-    font-weight: 300;
-}
-.hero .badge-row {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-.hero .badge {
-    background: rgba(255, 107, 53, 0.06);
-    border: 1px solid rgba(255, 107, 53, 0.06);
-    border-radius: 50px;
-    padding: 4px 14px;
-    font-size: 11px;
-    font-weight: 500;
-    color: rgba(255, 107, 53, 0.3);
-}
-/* ===== UPLOAD ===== */
-.upload-area {
-    background: rgba(255, 255, 255, 0.02);
-    border: 2px dashed rgba(255, 107, 53, 0.08);
-    border-radius: 24px;
-    padding: 50px 20px;
-    text-align: center;
-    margin: 20px auto 30px;
-    max-width: 900px;
-    cursor: pointer;
-    transition: 0.4s;
-    position: relative;
-    z-index: 1;
-}
-.upload-area:hover {
-    border-color: rgba(255, 107, 53, 0.2);
-    background: rgba(255, 255, 255, 0.03);
-}
-.upload-area .icon {
-    font-size: 48px;
-    display: block;
-    margin-bottom: 12px;
-}
-.upload-area h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #fff;
-}
-.upload-area p {
-    color: rgba(255, 255, 255, 0.2);
-    font-size: 13px;
-    margin-top: 4px;
-}
-.upload-area input {
-    display: none;
-}
-/* ===== TOOLS GRID ===== */
-.tools-section {
-    max-width: 1100px;
-    margin: 30px auto;
-    padding: 0 20px;
-    position: relative;
-    z-index: 1;
-}
-.tools-section .section-title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: #fff;
-}
-.tools-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px;
-}
-.tool-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 16px;
-    padding: 20px 8px;
-    text-align: center;
-    transition: 0.3s;
-    cursor: pointer;
-    position: relative;
-}
-.tool-card:hover {
-    border-color: rgba(255, 107, 53, 0.15);
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-4px);
-}
-.tool-card .emoji {
-    font-size: 28px;
-    display: block;
-    margin-bottom: 6px;
-}
-.tool-card .name {
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.6);
-}
-.tool-card .badge {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background: rgba(255, 107, 53, 0.08);
-    color: #ff6b35;
-    font-size: 7px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-/* ===== PREVIEW ===== */
-#previewArea {
-    text-align: center;
-    margin: 20px auto;
-    max-width: 900px;
-    display: none;
-    position: relative;
-    z-index: 1;
-}
-#previewImage {
-    max-width: 100%;
-    max-height: 400px;
-    border-radius: 20px;
-    border: 2px solid rgba(255, 107, 53, 0.06);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-}
-.preview-label {
-    color: #ff6b35;
-    margin-top: 10px;
-    font-weight: 500;
-    font-size: 14px;
-}
-/* ===== MODAL ===== */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(20px);
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-.modal.show {
-    display: flex;
-}
-.modal-box {
-    background: linear-gradient(160deg, #14101f, #1a1528);
-    border-radius: 28px;
-    padding: 40px 36px;
-    max-width: 420px;
-    width: 100%;
-    border: 1px solid rgba(255, 107, 53, 0.06);
-    animation: fadeUp 0.4s ease;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-}
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-.modal-box .close {
-    float: right;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 18px;
-    cursor: pointer;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.modal-box .close:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-}
-.modal-box .modal-icon {
-    text-align: center;
-    font-size: 44px;
-    margin-bottom: 4px;
-}
-.modal-box h2 {
-    font-size: 26px;
-    font-weight: 700;
-    text-align: center;
-    background: linear-gradient(135deg, #ff6b35, #ff8c00);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.modal-box .subtitle {
-    text-align: center;
-    color: rgba(255, 255, 255, 0.25);
-    font-size: 14px;
-    margin: 4px 0 24px;
-}
-.modal-box .input-group {
-    position: relative;
-    margin-bottom: 14px;
-}
-.modal-box .input-group .icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    opacity: 0.3;
-    transition: 0.3s;
-}
-.modal-box .input-group:focus-within .icon {
-    opacity: 0.7;
-}
-.modal-box input {
-    width: 100%;
-    padding: 14px 14px 14px 44px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.04);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 500;
-    outline: none;
-    transition: 0.3s;
-    box-sizing: border-box;
-}
-.modal-box input:focus {
-    border-color: #ff6b35;
-    background: rgba(255, 107, 53, 0.06);
-    box-shadow: 0 0 30px rgba(255, 107, 53, 0.05);
-}
-.modal-box input::placeholder {
-    color: rgba(255, 255, 255, 0.2);
-    font-weight: 400;
-}
-.modal-box .btn-submit {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #ff6b35, #ff8c00);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 4px;
-}
-.modal-box .btn-submit:hover {
-    transform: scale(1.02);
-    box-shadow: 0 8px 40px rgba(255, 107, 53, 0.2);
-}
-.divider {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 20px 0;
-    color: rgba(255, 255, 255, 0.04);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-.divider::before,
-.divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.04);
-}
-.email-list-btn {
-    width: 100%;
-    padding: 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    background: transparent;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-.email-list-btn:hover {
-    background: rgba(255, 255, 255, 0.04);
-    color: #fff;
-}
-.forgot-link {
-    display: block;
-    text-align: right;
-    color: rgba(255, 107, 53, 0.2);
-    font-size: 12px;
-    text-decoration: none;
-    margin: -4px 0 16px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.forgot-link:hover {
-    color: #ff6b35;
-}
-.switch-link {
-    text-align: center;
-    color: rgba(255, 255, 255, 0.12);
-    font-size: 13px;
-    margin-top: 16px;
-}
-.switch-link a {
-    color: #ff6b35;
-    text-decoration: none;
-    cursor: pointer;
-    font-weight: 500;
-}
-.switch-link a:hover {
-    text-decoration: underline;
-}
-.error-msg {
-    background: rgba(255, 0, 0, 0.04);
-    border: 1px solid rgba(255, 0, 0, 0.06);
-    border-radius: 10px;
-    padding: 10px;
-    color: #ff6b6b;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 14px;
-    display: none;
-}
-.success-msg {
-    background: rgba(255, 107, 53, 0.04);
-    border: 1px solid rgba(255, 107, 53, 0.06);
-    border-radius: 10px;
-    padding: 10px;
-    color: #ff8c00;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 14px;
-    display: none;
-}
-.email-suggest {
-    background: rgba(255, 107, 53, 0.02);
-    border: 1px solid rgba(255, 107, 53, 0.04);
-    border-radius: 10px;
-    padding: 4px;
-    margin-bottom: 14px;
-    display: none;
-    max-height: 120px;
-    overflow-y: auto;
-}
-.email-suggest .suggest-item {
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 13px;
-    font-weight: 500;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.email-suggest .suggest-item:hover {
-    background: rgba(255, 107, 53, 0.06);
-    color: #fff;
-}
-/* ===== USER MENU ===== */
-.user-menu {
-    position: relative;
-    display: none;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    padding: 4px 12px 4px 4px;
-    border-radius: 50px;
-    border: 1px solid transparent;
-    transition: 0.3s;
-}
-.user-menu.show {
-    display: flex;
-}
-.user-menu:hover {
-    border-color: rgba(255, 255, 255, 0.04);
-}
-.user-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff6b35, #ff8c00);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
-    color: #fff;
-    flex-shrink: 0;
-}
-.user-name {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px;
-    font-weight: 500;
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.user-dropdown {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    background: #14101f;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    padding: 6px;
-    min-width: 220px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-6px);
-    transition: 0.25s ease;
-    z-index: 100;
-}
-.user-dropdown.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-.user-dropdown .dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-}
-.user-dropdown .dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-    color: #fff;
-}
-.user-dropdown .dropdown-item.danger {
-    color: #ff6b6b;
-}
-.user-dropdown .dropdown-item.danger:hover {
-    background: rgba(255, 0, 0, 0.04);
-}
-.user-dropdown .dropdown-divider {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.04);
-    margin: 4px 10px;
-}
-.user-dropdown .user-email-display {
-    padding: 6px 12px;
-    color: rgba(255, 255, 255, 0.15);
-    font-size: 11px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    margin-bottom: 4px;
-    word-break: break-all;
-}
-.user-dropdown .referral-code {
-    padding: 6px 12px;
-    margin: 4px 0;
-    background: rgba(255, 107, 53, 0.04);
-    border: 1px dashed rgba(255, 107, 53, 0.06);
-    border-radius: 6px;
-    color: rgba(255, 255, 255, 0.2);
-    font-size: 11px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.user-dropdown .referral-code .code {
-    color: #ff8c00;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-}
-/* ===== FOOTER ===== */
-footer {
-    margin-top: 50px;
-    padding: 30px 20px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.02);
-    text-align: center;
-    color: rgba(255, 255, 255, 0.04);
-    font-size: 12px;
-    position: relative;
-    z-index: 1;
-}
-footer .footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-}
-footer .footer-links a {
-    color: rgba(255, 255, 255, 0.1);
-    text-decoration: none;
-    font-size: 12px;
-    transition: 0.3s;
-}
-footer .footer-links a:hover {
-    color: rgba(255, 255, 255, 0.2);
-}
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 32px;
-    }
-    .tools-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    header {
-        padding: 10px 16px;
-    }
-    .nav-left a {
-        font-size: 12px;
-    }
-    .modal-box {
-        padding: 28px 20px;
-        margin: 0 16px;
-    }
-}
-@media (max-width: 480px) {
-    .tools-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .hero h1 {
-        font-size: 26px;
-    }
-}
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Photo Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b35, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .btn-outline:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+        .btn-orange {
+            background: linear-gradient(135deg, #ff6b35, #ff8c00);
+            color: #fff;
+        }
+        .btn-orange:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+        .coin-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            border-radius: 50px;
+            padding: 6px 14px;
+        }
+        .coin-display .coin-count {
+            color: #ffd700;
+            font-weight: 700;
+        }
+        .user-menu {
+            position: relative;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 4px 12px 4px 4px;
+            border-radius: 50px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .user-menu.show {
+            display: flex;
+        }
+        .user-menu:hover {
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b35, #ff8c00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #fff;
+        }
+        .user-name {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 500;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: #1a1528;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 6px;
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: 0.25s ease;
+            z-index: 100;
+        }
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .user-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .user-dropdown .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+        }
+        .user-dropdown .dropdown-item.danger {
+            color: #ff6b6b;
+        }
+        .user-dropdown .dropdown-item.danger:hover {
+            background: rgba(255, 0, 0, 0.04);
+        }
+        .user-dropdown .dropdown-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            margin: 4px 10px;
+        }
+        .user-dropdown .user-email-display {
+            padding: 6px 12px;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+        .referral-display {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 107, 53, 0.04);
+            border: 1px solid rgba(255, 107, 53, 0.06);
+            border-radius: 50px;
+            padding: 4px 12px 4px 14px;
+        }
+        .referral-display.show {
+            display: flex;
+        }
+        .referral-display .ref-label {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .referral-display .ref-code {
+            color: #ff8c00;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .referral-display .ref-copy {
+            background: rgba(255, 255, 255, 0.04);
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            transition: 0.3s;
+        }
+        .referral-display .ref-copy:hover {
+            background: rgba(255, 107, 53, 0.06);
+            color: #fff;
+        }
+        .hero {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+        .hero h1 {
+            font-size: 40px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .upload-area {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed rgba(255, 107, 53, 0.08);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 20px 0 30px;
+            cursor: pointer;
+            transition: 0.4s;
+        }
+        .upload-area:hover {
+            border-color: rgba(255, 107, 53, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .upload-area .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .upload-area h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .upload-area p {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .upload-area input {
+            display: none;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .tool-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .tool-card:hover {
+            border-color: rgba(255, 107, 53, 0.15);
+            transform: translateY(-4px);
+        }
+        .tool-card .emoji {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .tool-card .name {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        #previewArea {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+        #previewImage {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 107, 53, 0.06);
+        }
+        .preview-label {
+            color: #ff6b35;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(20px);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-box {
+            background: linear-gradient(160deg, #14101f, #1a1528);
+            border-radius: 28px;
+            padding: 36px 32px;
+            max-width: 420px;
+            width: 100%;
+            border: 1px solid rgba(255, 107, 53, 0.06);
+            animation: fadeUp 0.4s ease;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .modal-box .close {
+            float: right;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-box .close:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+        .modal-box .modal-icon {
+            text-align: center;
+            font-size: 44px;
+            margin-bottom: 4px;
+        }
+        .modal-box h2 {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(135deg, #ff6b35, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .modal-box .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 14px;
+            margin: 4px 0 24px;
+        }
+        .modal-box .input-group {
+            position: relative;
+            margin-bottom: 14px;
+        }
+        .modal-box .input-group .icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            opacity: 0.2;
+        }
+        .modal-box input {
+            width: 100%;
+            padding: 14px 14px 14px 44px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+        .modal-box input:focus {
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.04);
+        }
+        .modal-box input::placeholder {
+            color: rgba(255, 255, 255, 0.1);
+        }
+        .modal-box .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ff6b35, #ff8c00);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 4px;
+        }
+        .modal-box .btn-submit:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 40px rgba(255, 107, 53, 0.2);
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 20px 0;
+            color: rgba(255, 255, 255, 0.04);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .email-list-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .email-list-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+        }
+        .switch-link {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.12);
+            font-size: 13px;
+            margin-top: 16px;
+        }
+        .switch-link a {
+            color: #ff6b35;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .switch-link a:hover {
+            text-decoration: underline;
+        }
+        .error-msg {
+            background: rgba(255, 0, 0, 0.04);
+            border: 1px solid rgba(255, 0, 0, 0.06);
+            border-radius: 10px;
+            padding: 10px;
+            color: #ff6b6b;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .success-msg {
+            background: rgba(255, 107, 53, 0.04);
+            border: 1px solid rgba(255, 107, 53, 0.06);
+            border-radius: 10px;
+            padding: 10px;
+            color: #ff8c00;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .email-suggest {
+            background: rgba(255, 107, 53, 0.02);
+            border: 1px solid rgba(255, 107, 53, 0.04);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 14px;
+            display: none;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .email-suggest .suggest-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .email-suggest .suggest-item:hover {
+            background: rgba(255, 107, 53, 0.04);
+            color: #fff;
+        }
+        .forgot-link {
+            display: block;
+            text-align: right;
+            color: rgba(255, 107, 53, 0.2);
+            font-size: 12px;
+            text-decoration: none;
+            margin: -4px 0 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .forgot-link:hover {
+            color: #ff6b35;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.04);
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+            .tools-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            header {
+                padding: 12px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
-<!-- ===== GLOW ===== -->
-<div class="bg-glow bg-glow-1"></div>
-<div class="bg-glow bg-glow-2"></div>
-<div class="bg-glow bg-glow-3"></div>
-
-<!-- ===== HEADER ===== -->
-<header>
-    <div class="nav-left">
-        <div class="logo">
-            AI<span>Studio</span><span class="dot">.</span>
-        </div>
-        <a href="#">Features</a>
-        <a href="#">Pricing</a>
-    </div>
-    <div class="nav-right">
-        <!-- COIN DISPLAY -->
-        <div class="coin-display">
-            <span class="coin-icon">🪙</span>
-            <span class="coin-count" id="coinCount">0</span>
-        </div>
-        <!-- REFERRAL DISPLAY -->
-        <div class="referral-display" id="referralDisplay">
-            <span class="ref-label">🔗 Ref</span>
-            <span class="ref-code" id="headerRefCode">------</span>
-            <button class="ref-copy" id="copyRefBtn">Copy</button>
-        </div>
-        <button class="btn-outline" id="openLogin">Sign In</button>
-        <button class="btn-orange" id="openLoginGold">Get Started</button>
-        <!-- User Menu -->
-        <div class="user-menu" id="userMenu">
-            <div class="user-avatar" id="userAvatar">U</div>
-            <span class="user-name" id="userName">User</span>
-            <div class="user-dropdown" id="userDropdown">
-                <div class="user-email-display" id="userEmailDisplay">user@email.com</div>
-                <div class="referral-code">
-                    <span>🔗 Referral Code</span>
-                    <span class="code" id="dropdownRefCode">------</span>
+    <div class="container">
+        <header>
+            <div class="logo">AI<span style="color:#fff;">Editor</span></div>
+            <div class="nav-right">
+                <div class="coin-display">
+                    <span>🪙</span>
+                    <span class="coin-count" id="coinCount">0</span>
                 </div>
-                <button class="dropdown-item" id="accountBtn"><span>👤</span> My Account</button>
-                <button class="dropdown-item" id="settingsBtn"><span>⚙️</span> Settings</button>
-                <div class="dropdown-divider"></div>
-                <button class="dropdown-item danger" id="logoutBtn"><span>🚪</span> Sign Out</button>
+                <div class="referral-display" id="referralDisplay">
+                    <span class="ref-label">🔗 Ref</span>
+                    <span class="ref-code" id="headerRefCode">------</span>
+                    <button class="ref-copy" id="copyRefBtn">Copy</button>
+                </div>
+                <button class="btn btn-outline" id="openLogin">ورود</button>
+                <button class="btn btn-orange" id="openLoginGold">شروع</button>
+                <div class="user-menu" id="userMenu">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span class="user-name" id="userName">User</span>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-email-display" id="userEmailDisplay">user@email.com</div>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" id="accountBtn"><span>👤</span> حساب من</button>
+                        <button class="dropdown-item" id="settingsBtn"><span>⚙️</span> تنظیمات</button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item danger" id="logoutBtn"><span>🚪</span> خروج</button>
+                    </div>
+                </div>
             </div>
+        </header>
+
+        <section class="hero">
+            <h1>ویرایش عکس با هوش مصنوعی</h1>
+            <p>رایگان، بدون نیاز به نصب — توی مرورگر خودت</p>
+        </section>
+
+        <div class="upload-area" id="uploadBox">
+            <span class="icon">🖼️</span>
+            <h3>عکس خودت رو بذار اینجا</h3>
+            <p>پشتیبانی: JPG, PNG, WEBP</p>
+            <input type="file" id="fileInput" accept="image/*" />
+        </div>
+
+        <div id="previewArea">
+            <img id="previewImage" src="#" alt="preview" />
+            <p class="preview-label">✨ آماده برای ویرایش</p>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card"><span class="emoji">🧹</span><span class="name">حذف پس‌زمینه</span></div>
+            <div class="tool-card"><span class="emoji">✨</span><span class="name">بهبود کیفیت</span></div>
+            <div class="tool-card"><span class="emoji">🎨</span><span class="name">تغییر رنگ</span></div>
+            <div class="tool-card"><span class="emoji">🖌️</span><span class="name">پاک‌کن هوشمند</span></div>
+            <div class="tool-card"><span class="emoji">👤</span><span class="name">پرتره</span></div>
+            <div class="tool-card"><span class="emoji">📐</span><span class="name">تغییر اندازه</span></div>
         </div>
     </div>
-</header>
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-    <h1>AI-Powered Photo Editing</h1>
-    <p>Edit, generate, and design online — free, right in your browser</p>
-    <div class="badge-row">
-        <span class="badge">✨ Powered by AI</span>
-        <span class="badge">🎨 20+ Tools</span>
-        <span class="badge">🚀 Free</span>
+    <!-- ===== LOGIN MODAL ===== -->
+    <div class="modal" id="loginModal">
+        <div class="modal-box">
+            <button class="close" id="closeModal">✕</button>
+            <div class="modal-icon">✨</div>
+            <h2>خوش آمدی</h2>
+            <p class="subtitle">وارد شو تا همه امکانات رو داشته باشی</p>
+            <div class="success-msg" id="successMsg">✅ خوش آمدی!</div>
+            <div class="error-msg" id="errorMsg">❌ اطلاعات اشتباه است</div>
+            <div class="email-suggest" id="emailSuggest"></div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <span class="icon">📧</span>
+                    <input type="email" id="loginEmail" placeholder="ایمیل" required />
+                </div>
+                <div class="input-group">
+                    <span class="icon">🔒</span>
+                    <input type="password" id="loginPassword" placeholder="رمز عبور" required />
+                </div>
+                <a class="forgot-link" id="forgotBtn">رمزت رو فراموش کردی؟</a>
+                <button type="submit" class="btn-submit">ورود</button>
+            </form>
+            <div class="divider">یا</div>
+            <button class="email-list-btn" id="showSavedEmails">
+                📧 استفاده از ایمیل ذخیره شده
+            </button>
+            <div class="switch-link">حساب نداری؟ <a id="switchToSignup">ثبت‌نام کن</a></div>
+        </div>
     </div>
-</section>
 
-<!-- ===== UPLOAD ===== -->
-<div class="upload-area" id="uploadBox">
-    <span class="icon">🖼️</span>
-    <h3>Drop your image here</h3>
-    <p>Supported: JPG, PNG, WEBP · Max 20MB</p>
-    <input type="file" id="fileInput" accept="image/*" />
-</div>
-
-<!-- ===== PREVIEW ===== -->
-<div id="previewArea">
-    <img id="previewImage" src="#" alt="preview" />
-    <p class="preview-label">✨ Ready for editing</p>
-</div>
-
-<!-- ===== TOOLS ===== -->
-<section class="tools-section">
-    <div class="section-title">AI Tools & Quick Actions</div>
-    <div class="tools-grid">
-        <div class="tool-card"><span class="emoji">🧹</span><span class="name">Remove BG</span><span class="badge">AI</span></div>
-        <div class="tool-card"><span class="emoji">✨</span><span class="name">Enhance</span><span class="badge">AI</span></div>
-        <div class="tool-card"><span class="emoji">🎨</span><span class="name">Recolor</span><span class="badge">Pro</span></div>
-        <div class="tool-card"><span class="emoji">🖌️</span><span class="name">Inpaint</span><span class="badge">AI</span></div>
-        <div class="tool-card"><span class="emoji">👤</span><span class="name">Portrait</span><span class="badge">Pro</span></div>
-        <div class="tool-card"><span class="emoji">📐</span><span class="name">Resize</span><span class="badge">AI</span></div>
-        <div class="tool-card"><span class="emoji">🌅</span><span class="name">Expand</span><span class="badge">AI</span></div>
-        <div class="tool-card"><span class="emoji">🎭</span><span class="name">Face Swap</span><span class="badge">Pro</span></div>
-        <div class="tool-card"><span class="emoji">🎬</span><span class="name">Video Gen</span><span class="badge">AI</span></div>
-        <div class="tool-card"><span class="emoji">🎵</span><span class="name">Audio Gen</span><span class="badge">New</span></div>
-        <div class="tool-card"><span class="emoji">🔊</span><span class="name">Text to Speech</span><span class="badge">AI</span></div>
-        <div class="tool-card"><span class="emoji">📝</span><span class="name">Transcribe</span><span class="badge">Pro</span></div>
+    <!-- ===== SIGNUP MODAL ===== -->
+    <div class="modal" id="signupModal">
+        <div class="modal-box">
+            <button class="close" id="closeSignup">✕</button>
+            <div class="modal-icon">🚀</div>
+            <h2>ثبت‌نام</h2>
+            <p class="subtitle">چند ثانیه بیشتر وقت نمی‌گیره</p>
+            <div class="error-msg" id="signupError">❌ رمزها مطابقت ندارند</div>
+            <form id="signupForm">
+                <div class="input-group">
+                    <span class="icon">📧</span>
+                    <input type="email" id="signupEmail" placeholder="ایمیل" required />
+                </div>
+                <div class="input-group">
+                    <span class="icon">🔒</span>
+                    <input type="password" id="signupPassword" placeholder="رمز عبور (حداقل ۶ کاراکتر)" required minlength="6" />
+                </div>
+                <div class="input-group">
+                    <span class="icon">✓</span>
+                    <input type="password" id="signupConfirm" placeholder="تکرار رمز عبور" required />
+                </div>
+                <div class="input-group">
+                    <span class="icon">🔗</span>
+                    <input type="text" id="signupReferral" placeholder="کد معرف (اختیاری)" maxlength="5" style="text-transform:uppercase; letter-spacing:2px;" />
+                </div>
+                <button type="submit" class="btn-submit">ثبت‌نام</button>
+            </form>
+            <div class="divider">یا</div>
+            <button class="email-list-btn" id="showSavedEmailsSignup">
+                📧 استفاده از ایمیل ذخیره شده
+            </button>
+            <div class="switch-link">قبلاً ثبت‌نام کردی؟ <a id="switchToLogin">وارد شو</a></div>
+        </div>
     </div>
-</section>
 
-<!-- ===== FOOTER ===== -->
-<footer>
-    <div class="footer-links">
-        <a href="#">About</a>
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Contact</a>
+    <!-- ===== FORGOT PASSWORD ===== -->
+    <div class="modal" id="forgotModal">
+        <div class="modal-box">
+            <button class="close" id="closeForgot">✕</button>
+            <div class="modal-icon">🔑</div>
+            <h2>بازیابی رمز</h2>
+            <p class="subtitle">ایمیلت رو بده تا لینک بازیابی برات بفرستیم</p>
+            <div class="success-msg" id="forgotMsg">✅ لینک بازیابی فرستاده شد!</div>
+            <div class="error-msg" id="forgotError">❌ این ایمیل ثبت نشده</div>
+            <form id="forgotForm">
+                <div class="input-group">
+                    <span class="icon">📧</span>
+                    <input type="email" id="forgotEmail" placeholder="ایمیل" required />
+                </div>
+                <button type="submit" class="btn-submit">ارسال لینک</button>
+            </form>
+            <div class="switch-link"><a id="backToLogin">← برگشت به ورود</a></div>
+        </div>
     </div>
-    © 2026 AI Studio · Next-Generation Photo Editing
-</footer>
 
-<!-- ===== LOGIN MODAL ===== -->
-<div class="modal" id="loginModal">
-    <div class="modal-box">
-        <button class="close" id="closeModal">✕</button>
-        <div class="modal-icon">✨</div>
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Sign in to access all AI features</p>
-        <div class="success-msg" id="successMsg">✅ Welcome back!</div>
-        <div class="error-msg" id="errorMsg">❌ Invalid credentials</div>
-        <div class="email-suggest" id="emailSuggest"></div>
-        <form id="loginForm">
-            <div class="input-group">
-                <span class="icon">📧</span>
-                <input type="email" id="loginEmail" placeholder="Email address" required autocomplete="email" />
-            </div>
-            <div class="input-group">
-                <span class="icon">🔒</span>
-                <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password" />
-            </div>
-            <a class="forgot-link" id="forgotBtn">Forgot password?</a>
-            <button type="submit" class="btn-submit">Sign In</button>
-        </form>
-        <div class="divider">or</div>
-        <button class="email-list-btn" id="showSavedEmails">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:16px;height:16px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Use saved email
-        </button>
-        <div class="switch-link">New here? <a id="switchToSignup">Create account</a></div>
-    </div>
-</div>
+    <footer>© 2026 AI Editor · ویرایش عکس با هوش مصنوعی</footer>
 
-<!-- ===== SIGNUP MODAL ===== -->
-<div class="modal" id="signupModal">
-    <div class="modal-box">
-        <button class="close" id="closeSignup">✕</button>
-        <div class="modal-icon">🚀</div>
-        <h2>Get Started</h2>
-        <p class="subtitle">Create your account in seconds</p>
-        <div class="error-msg" id="signupError">❌ Passwords don't match</div>
-        <form id="signupForm">
-            <div class="input-group">
-                <span class="icon">📧</span>
-                <input type="email" id="signupEmail" placeholder="Email address" required autocomplete="email" />
-            </div>
-            <div class="input-group">
-                <span class="icon">🔒</span>
-                <input type="password" id="signupPassword" placeholder="Create password" required minlength="6" autocomplete="new-password" />
-            </div>
-            <div class="input-group">
-                <span class="icon">✓</span>
-                <input type="password" id="signupConfirm" placeholder="Confirm password" required autocomplete="new-password" />
-            </div>
-            <button type="submit" class="btn-submit">Create Account</button>
-        </form>
-        <div class="divider">or</div>
-        <button class="email-list-btn" id="showSavedEmailsSignup">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:16px;height:16px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Use saved email
-        </button>
-        <div class="switch-link">Already have an account? <a id="switchToLogin">Sign In</a></div>
-    </div>
-</div>
+    <script>
+        // ===== مدیریت کاربران با Local Storage =====
+        let currentUser = null;
+        let users = JSON.parse(localStorage.getItem('ai_editor_users')) || {};
+        let userCoins = JSON.parse(localStorage.getItem('ai_editor_coins')) || {};
+        let referralCodes = JSON.parse(localStorage.getItem('ai_editor_referrals')) || {};
 
-<!-- ===== FORGOT PASSWORD ===== -->
-<div class="modal" id="forgotModal">
-    <div class="modal-box">
-        <button class="close" id="closeForgot">✕</button>
-        <div class="modal-icon">🔑</div>
-        <h2>Reset Password</h2>
-        <p class="subtitle">Enter your email to receive a reset link</p>
-        <div class="success-msg" id="forgotMsg">✅ Reset link sent! Check your email.</div>
-        <div class="error-msg" id="forgotError">❌ No account found with this email</div>
-        <form id="forgotForm">
-            <div class="input-group">
-                <span class="icon">📧</span>
-                <input type="email" id="forgotEmail" placeholder="Email address" required autocomplete="email" />
-            </div>
-            <button type="submit" class="btn-submit">Send Reset Link</button>
-        </form>
-        <div class="switch-link"><a id="backToLogin">← Back to Sign In</a></div>
-    </div>
-</div>
-
-<script>
-// ===== STATE =====
-let currentUser = null;
-let users = JSON.parse(localStorage.getItem('ai_editor_users')) || {};
-let userCoins = JSON.parse(localStorage.getItem('ai_editor_coins')) || {};
-let referralCodes = JSON.parse(localStorage.getItem('ai_editor_referrals')) || {};
-
-function saveUsers(){localStorage.setItem('ai_editor_users',JSON.stringify(users))}
-function saveCoins(){localStorage.setItem('ai_editor_coins',JSON.stringify(userCoins))}
-function saveReferrals(){localStorage.setItem('ai_editor_referrals',JSON.stringify(referralCodes))}
-
-// ===== GENERATE 5-DIGIT REFERRAL CODE =====
-function generateReferralCode(email){
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for(let i = 0; i < 5; i++){
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-}
-
-function getReferralCode(email){
-    if(!referralCodes[email]){
-        referralCodes[email] = generateReferralCode(email);
-        saveReferrals();
-    }
-    return referralCodes[email];
-}
-
-function getCoins(email){
-    if(!userCoins[email]) userCoins[email] = 0;
-    return userCoins[email];
-}
-
-function addCoins(email, amount){
-    if(!userCoins[email]) userCoins[email] = 0;
-    userCoins[email] += amount;
-    saveCoins();
-    updateCoinDisplay();
-}
-
-// ===== UPDATE COIN DISPLAY =====
-function updateCoinDisplay(){
-    const coinCount = document.getElementById('coinCount');
-    if(currentUser){
-        coinCount.textContent = getCoins(currentUser);
-    }else{
-        coinCount.textContent = '0';
-    }
-}
-
-// ===== UPDATE REFERRAL DISPLAY =====
-function updateReferralDisplay(){
-    const refDisplay = document.getElementById('referralDisplay');
-    const headerRefCode = document.getElementById('headerRefCode');
-    const dropdownRefCode = document.getElementById('dropdownRefCode');
-    if(currentUser){
-        const code = getReferralCode(currentUser);
-        refDisplay.classList.add('show');
-        headerRefCode.textContent = code;
-        dropdownRefCode.textContent = code;
-    }else{
-        refDisplay.classList.remove('show');
-    }
-}
-
-// ===== COPY REFERRAL =====
-document.getElementById('copyRefBtn').addEventListener('click', function(){
-    const code = document.getElementById('headerRefCode').textContent;
-    if(code && code !== '------'){
-        navigator.clipboard.writeText(code).then(() => {
-            const btn = this;
-            btn.textContent = '✓';
-            btn.classList.add('copied');
-            setTimeout(() => {
-                btn.textContent = 'Copy';
-                btn.classList.remove('copied');
-            }, 2000);
-        });
-    }
-});
-
-function showModal(id){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show'));document.getElementById(id).classList.add('show')}
-function hideAllModals(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show'))}
-
-// ===== SAVED EMAILS =====
-function getSavedEmails(){
-    let emails=[];
-    try{const saved=localStorage.getItem('saved_emails');if(saved){emails=JSON.parse(saved)}}catch(e){}
-    for(let email in users){if(!emails.includes(email)){emails.push(email)}}
-    return emails;
-}
-function saveEmail(email){let emails=getSavedEmails();if(!emails.includes(email)){emails.push(email);localStorage.setItem('saved_emails',JSON.stringify(emails))}}
-
-function showEmailSuggestions(targetInputId,suggestContainerId){
-    const container=document.getElementById(suggestContainerId);
-    const emails=getSavedEmails();
-    if(emails.length===0){container.style.display='none';return}
-    container.innerHTML='';
-    emails.forEach(email=>{const div=document.createElement('div');div.className='suggest-item';div.innerHTML='📧 '+email;div.addEventListener('click',function(){document.getElementById(targetInputId).value=email;container.style.display='none';saveEmail(email)});container.appendChild(div)});
-    container.style.display='block';
-}
-
-document.getElementById('showSavedEmails').addEventListener('click',function(e){e.preventDefault();const container=document.getElementById('emailSuggest');if(container.style.display==='block'){container.style.display='none'}else{showEmailSuggestions('loginEmail','emailSuggest')}});
-document.getElementById('showSavedEmailsSignup').addEventListener('click',function(e){e.preventDefault();const container=document.getElementById('emailSuggest');if(container.style.display==='block'){container.style.display='none'}else{showEmailSuggestions('loginEmail','emailSuggest')}});
-
-// ===== UPDATE UI =====
-function updateUI(){
-    const loginBtn=document.getElementById('openLogin');
-    const loginBtnGold=document.getElementById('openLoginGold');
-    const userMenu=document.getElementById('userMenu');
-    const uploadBox=document.getElementById('uploadBox');
-    const heroP=document.querySelector('.hero p');
-    const avatar=document.getElementById('userAvatar');
-    const userName=document.getElementById('userName');
-    const emailDisplay=document.getElementById('userEmailDisplay');
-
-    if(currentUser){
-        loginBtn.style.display='none';
-        loginBtnGold.style.display='none';
-        userMenu.classList.add('show');
-        uploadBox.querySelector('h3').textContent='Drop your image here';
-        uploadBox.querySelector('p').textContent='Supported: JPG, PNG, WEBP · Max 20MB';
-        uploadBox.querySelector('.icon').textContent='🖼️';
-        heroP.textContent='Welcome back, '+currentUser+' — ready to create?';
-        avatar.textContent=currentUser.charAt(0).toUpperCase();
-        userName.textContent=currentUser.split('@')[0];
-        emailDisplay.textContent=currentUser;
-        updateCoinDisplay();
-        updateReferralDisplay();
-    }else{
-        loginBtn.style.display='inline-block';
-        loginBtnGold.style.display='inline-block';
-        userMenu.classList.remove('show');
-        uploadBox.querySelector('h3').textContent='Drop your image here';
-        uploadBox.querySelector('p').textContent='Supported: JPG, PNG, WEBP · Max 20MB';
-        uploadBox.querySelector('.icon').textContent='🖼️';
-        heroP.textContent='Edit, generate, and design online — free, right in your browser';
-        document.getElementById('previewArea').style.display='none';
-        document.getElementById('coinCount').textContent = '0';
-        updateReferralDisplay();
-    }
-}
-
-// ===== LOGIN =====
-document.getElementById('loginForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    const email=document.getElementById('loginEmail').value.trim();
-    const pass=document.getElementById('loginPassword').value;
-    const errMsg=document.getElementById('errorMsg');
-    errMsg.style.display='none';
-    if(!email||!pass){errMsg.textContent='❌ Please fill in all fields';errMsg.style.display='block';return}
-    if(users[email]&&users[email]===pass){
-        currentUser=email;saveUsers();updateUI();hideAllModals();saveEmail(email);
-        if(!userCoins[email] || userCoins[email] === 0){
-            addCoins(email, 5);
+        function saveUsers() {
+            localStorage.setItem('ai_editor_users', JSON.stringify(users));
         }
-        document.getElementById('successMsg').style.display='block';
-        setTimeout(()=>document.getElementById('successMsg').style.display='none',3000);
-        document.getElementById('loginEmail').value='';
-        document.getElementById('loginPassword').value='';
-    }else if(users[email]){errMsg.textContent='❌ Wrong password! Try again.';errMsg.style.display='block'}
-    else{errMsg.textContent='❌ Account not found. Please sign up.';errMsg.style.display='block'}
-});
 
-// ===== SIGNUP =====
-document.getElementById('signupForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    const email=document.getElementById('signupEmail').value.trim();
-    const pass=document.getElementById('signupPassword').value;
-    const confirm=document.getElementById('signupConfirm').value;
-    const errMsg=document.getElementById('signupError');
-    errMsg.style.display='none';
-    if(!email||!pass||!confirm){errMsg.textContent='❌ Please fill in all fields';errMsg.style.display='block';return}
-    if(pass!==confirm){errMsg.textContent='❌ Passwords do not match!';errMsg.style.display='block';return}
-    if(pass.length<6){errMsg.textContent='❌ Password must be at least 6 characters.';errMsg.style.display='block';return}
-    if(users[email]){errMsg.textContent='❌ Email already registered.';errMsg.style.display='block';return}
-    users[email]=pass;saveUsers();currentUser=email;updateUI();hideAllModals();saveEmail(email);
-    addCoins(email, 10);
-    alert('✅ Welcome '+email+'! You got 10 free coins! 🪙');
-    document.getElementById('signupEmail').value='';
-    document.getElementById('signupPassword').value='';
-    document.getElementById('signupConfirm').value='';
-});
+        function saveCoins() {
+            localStorage.setItem('ai_editor_coins', JSON.stringify(userCoins));
+        }
 
-// ===== FORGOT =====
-document.getElementById('forgotForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    const email=document.getElementById('forgotEmail').value.trim();
-    const errMsg=document.getElementById('forgotError');
-    errMsg.style.display='none';
-    if(!email){errMsg.textContent='❌ Please enter your email.';errMsg.style.display='block';return}
-    if(users[email]){
-        document.getElementById('forgotMsg').style.display='block';
-        setTimeout(()=>document.getElementById('forgotMsg').style.display='none',4000);
-        alert('📧 Reset link sent to '+email);
-        document.getElementById('forgotEmail').value='';
-    }else{errMsg.textContent='❌ No account found.';errMsg.style.display='block'}
-});
+        function saveReferrals() {
+            localStorage.setItem('ai_editor_referrals', JSON.stringify(referralCodes));
+        }
 
-// ===== LOGOUT =====
-document.getElementById('logoutBtn').addEventListener('click',function(e){
-    e.preventDefault();
-    if(confirm('Sign out?')){currentUser=null;updateUI();alert('👋 Signed out');}
-});
+        function generateReferralCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 5; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
 
-// ===== DROPDOWN =====
-document.getElementById('userMenu').addEventListener('click',function(e){
-    e.stopPropagation();
-    document.getElementById('userDropdown').classList.toggle('show');
-});
-document.addEventListener('click',function(){document.getElementById('userDropdown').classList.remove('show')});
+        function getReferralCode(email) {
+            if (!referralCodes[email]) {
+                referralCodes[email] = generateReferralCode();
+                saveReferrals();
+            }
+            return referralCodes[email];
+        }
 
-// ===== SWITCH MODALS =====
-document.getElementById('switchToSignup').addEventListener('click',function(e){e.preventDefault();showModal('signupModal')});
-document.getElementById('switchToLogin').addEventListener('click',function(e){e.preventDefault();showModal('loginModal')});
-document.getElementById('backToLogin').addEventListener('click',function(e){e.preventDefault();showModal('loginModal')});
-document.getElementById('forgotBtn').addEventListener('click',function(e){e.preventDefault();showModal('forgotModal')});
+        function getCoins(email) {
+            if (!userCoins[email]) userCoins[email] = 10;
+            return userCoins[email];
+        }
 
-// ===== OPEN =====
-document.getElementById('openLogin').addEventListener('click',function(e){e.preventDefault();showModal('loginModal')});
-document.getElementById('openLoginGold').addEventListener('click',function(e){e.preventDefault();showModal('loginModal')});
-document.getElementById('closeModal').addEventListener('click',hideAllModals);
-document.getElementById('closeForgot').addEventListener('click',hideAllModals);
-document.getElementById('closeSignup').addEventListener('click',hideAllModals);
-document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',function(e){if(e.target===this)hideAllModals()})});
+        function addCoins(email, amount) {
+            if (!userCoins[email]) userCoins[email] = 10;
+            userCoins[email] += amount;
+            saveCoins();
+            updateCoinDisplay();
+        }
 
-// ===== UPLOAD =====
-var uploadBox=document.getElementById('uploadBox'),fileInput=document.getElementById('fileInput');
-uploadBox.addEventListener('click',function(){fileInput.click()});
-fileInput.addEventListener('change',function(e){var file=e.target.files[0];if(file){var reader=new FileReader();reader.onload=function(ev){document.getElementById('previewImage').src=ev.target.result;document.getElementById('previewArea').style.display='block'};reader.readAsDataURL(file)}});
+        function updateCoinDisplay() {
+            const coinCount = document.getElementById('coinCount');
+            if (coinCount) {
+                coinCount.textContent = currentUser ? getCoins(currentUser) : '0';
+            }
+        }
 
-// ===== TOOLS =====
-document.querySelectorAll('.tool-card').forEach(function(tool){
-    tool.addEventListener('click',function(){
-        alert('🛠️ '+this.querySelector('.name').textContent+' — Coming soon!');
-    });
-});
+        function updateReferralDisplay() {
+            const refDisplay = document.getElementById('referralDisplay');
+            const headerRefCode = document.getElementById('headerRefCode');
+            const dropdownRefCode = document.getElementById('dropdownRefCode');
+            if (currentUser) {
+                const code = getReferralCode(currentUser);
+                if (refDisplay) refDisplay.classList.add('show');
+                if (headerRefCode) headerRefCode.textContent = code;
+                if (dropdownRefCode) dropdownRefCode.textContent = code;
+            } else {
+                if (refDisplay) refDisplay.classList.remove('show');
+            }
+        }
 
-// ===== ACCOUNT & SETTINGS =====
-document.getElementById('accountBtn').addEventListener('click',function(){
-    alert('👤 Account: '+currentUser+'\n🪙 Coins: '+getCoins(currentUser)+'\n🔗 Referral: '+getReferralCode(currentUser));
-    document.getElementById('userDropdown').classList.remove('show');
-});
-document.getElementById('settingsBtn').addEventListener('click',function(){
-    alert('⚙️ Settings');
-    document.getElementById('userDropdown').classList.remove('show');
-});
+        document.getElementById('copyRefBtn')?.addEventListener('click', function() {
+            const code = document.getElementById('headerRefCode').textContent;
+            if (code && code !== '------') {
+                navigator.clipboard.writeText(code).then(() => {
+                    const btn = this;
+                    btn.textContent = '✓';
+                    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+                });
+            }
+        });
 
-// ===== INIT =====
-updateUI();
-document.getElementById('openLogin').addEventListener('click',function(){
-    setTimeout(()=>{showEmailSuggestions('loginEmail','emailSuggest')},300);
-});
-</script>
+        function showSavedEmails() {
+            const container = document.getElementById('emailSuggest');
+            if (!container) return;
+            const emails = Object.keys(users);
+            if (emails.length === 0) {
+                alert('هیچ ایمیل ذخیره‌ای وجود ندارد.');
+                return;
+            }
+            container.innerHTML = '';
+            emails.forEach(email => {
+                const div = document.createElement('div');
+                div.className = 'suggest-item';
+                div.innerHTML = '📧 ' + email;
+                div.addEventListener('click', function() {
+                    document.getElementById('loginEmail').value = email;
+                    container.style.display = 'none';
+                });
+                container.appendChild(div);
+            });
+            container.style.display = 'block';
+        }
+
+        function signupUser(email, password, referral) {
+            if (users[email]) {
+                alert('❌ این ایمیل قبلاً ثبت شده!');
+                return false;
+            }
+            if (password.length < 6) {
+                alert('❌ رمز باید حداقل ۶ کاراکتر باشد!');
+                return false;
+            }
+            users[email] = password;
+            saveUsers();
+            currentUser = email;
+
+            addCoins(email, 10);
+
+            if (referral) {
+                for (let u in referralCodes) {
+                    if (referralCodes[u] === referral && u !== email) {
+                        addCoins(u, 15);
+                        alert('🎉 کد معرف قبول شد! ' + u + ' ۱۵ سکه گرفت!');
+                        break;
+                    }
+                }
+            }
+
+            updateUI();
+            alert('✅ ثبت‌نام موفق! ۱۰ سکه هدیه گرفتی! 🪙');
+            return true;
+        }
+
+        function loginUser(email, password) {
+            if (!users[email]) {
+                alert('❌ این ایمیل ثبت نشده!');
+                return false;
+            }
+            if (users[email] !== password) {
+                alert('❌ رمز عبور اشتباه است!');
+                return false;
+            }
+            currentUser = email;
+            if (!userCoins[email]) addCoins(email, 5);
+            updateUI();
+            alert('✅ خوش برگشتی ' + email + '!');
+            return true;
+        }
+
+        function logoutUser() {
+            if (confirm('خارج میشی؟')) {
+                currentUser = null;
+                updateUI();
+                alert('👋 خارج شدی!');
+            }
+        }
+
+        function updateUI() {
+            const loginBtn = document.getElementById('openLogin');
+            const loginBtnGold = document.getElementById('openLoginGold');
+            const userMenu = document.getElementById('userMenu');
+            const heroP = document.querySelector('.hero p');
+            const avatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            const emailDisplay = document.getElementById('userEmailDisplay');
+            const uploadBox = document.getElementById('uploadBox');
+
+            if (currentUser) {
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (loginBtnGold) loginBtnGold.style.display = 'none';
+                if (userMenu) userMenu.classList.add('show');
+                if (heroP) heroP.textContent = 'خوش آمدی ' + currentUser + ' — آماده‌ای؟';
+                if (avatar) avatar.textContent = currentUser.charAt(0).toUpperCase();
+                if (userName) userName.textContent = currentUser.split('@')[0];
+                if (emailDisplay) emailDisplay.textContent = currentUser;
+                if (uploadBox) {
+                    uploadBox.querySelector('h3').textContent = 'عکس خودت رو بذار اینجا';
+                    uploadBox.querySelector('p').textContent = 'پشتیبانی: JPG, PNG, WEBP';
+                    uploadBox.querySelector('.icon').textContent = '🖼️';
+                }
+                updateCoinDisplay();
+                updateReferralDisplay();
+            } else {
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (loginBtnGold) loginBtnGold.style.display = 'inline-block';
+                if (userMenu) userMenu.classList.remove('show');
+                if (heroP) heroP.textContent = 'رایگان، بدون نیاز به نصب — توی مرورگر خودت';
+                if (uploadBox) {
+                    uploadBox.querySelector('h3').textContent = 'برای آپلود عکس وارد شو';
+                    uploadBox.querySelector('p').textContent = 'ورود کن تا همه امکانات باز بشه';
+                    uploadBox.querySelector('.icon').textContent = '🔒';
+                }
+                document.getElementById('previewArea').style.display = 'none';
+                document.getElementById('coinCount').textContent = '0';
+                updateReferralDisplay();
+            }
+        }
+
+        function showModal(id) {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+            document.getElementById(id).classList.add('show');
+        }
+
+        function hideAllModals() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('signupForm')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('signupEmail').value.trim();
+                const password = document.getElementById('signupPassword').value;
+                const confirm = document.getElementById('signupConfirm').value;
+                const referral = document.getElementById('signupReferral').value.trim().toUpperCase();
+
+                if (password !== confirm) {
+                    alert('❌ رمزها مطابقت ندارند!');
+                    return;
+                }
+                signupUser(email, password, referral);
+                this.reset();
+                hideAllModals();
+            });
+
+            document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                loginUser(email, password);
+                this.reset();
+                hideAllModals();
+            });
+
+            document.getElementById('logoutBtn')?.addEventListener('click', logoutUser);
+
+            document.getElementById('showSavedEmails')?.addEventListener('click', showSavedEmails);
+            document.getElementById('showSavedEmailsSignup')?.addEventListener('click', showSavedEmails);
+
+            document.getElementById('switchToSignup')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal('signupModal');
+            });
+            document.getElementById('switchToLogin')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal('loginModal');
+            });
+            document.getElementById('backToLogin')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal('loginModal');
+            });
+            document.getElementById('forgotBtn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal('forgotModal');
+            });
+
+            document.getElementById('openLogin')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal('loginModal');
+            });
+            document.getElementById('openLoginGold')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal('loginModal');
+            });
+
+            document.querySelectorAll('.modal .close').forEach(btn => {
+                btn.addEventListener('click', hideAllModals);
+            });
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) hideAllModals();
+                });
+            });
+
+            const uploadBox = document.getElementById('uploadBox');
+            const fileInput = document.getElementById('fileInput');
+            if (uploadBox && fileInput) {
+                uploadBox.addEventListener('click', function() {
+                    if (!currentUser) {
+                        alert('🔒 لطفاً اول وارد شو!');
+                        showModal('loginModal');
+                        return;
+                    }
+                    fileInput.click();
+                });
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file && currentUser) {
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            document.getElementById('previewImage').src = ev.target.result;
+                            document.getElementById('previewArea').style.display = 'block';
+                            uploadBox.style.display = 'none';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                uploadBox.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    if (currentUser) this.style.borderColor = '#ff6b35';
+                });
+                uploadBox.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (!currentUser) {
+                        alert('🔒 لطفاً اول وارد شو!');
+                        showModal('loginModal');
+                        return;
+                    }
+                    const file = e.dataTransfer.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            document.getElementById('previewImage').src = ev.target.result;
+                            document.getElementById('previewArea').style.display = 'block';
+                            uploadBox.style.display = 'none';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            document.querySelectorAll('.tool-card').forEach(tool => {
+                tool.addEventListener('click', function() {
+                    if (!currentUser) {
+                        alert('🔒 برای استفاده از ابزارها وارد شو!');
+                        showModal('loginModal');
+                        return;
+                    }
+                    alert('🛠️ ' + this.querySelector('.name').textContent + ' — به زودی!');
+                });
+            });
+
+            document.getElementById('accountBtn')?.addEventListener('click', function() {
+                if (currentUser) {
+                    alert('👤 حساب کاربری: ' + currentUser + '\n🪙 سکه: ' + getCoins(currentUser) + '\n🔗 کد معرف: ' + getReferralCode(currentUser));
+                }
+                document.getElementById('userDropdown').classList.remove('show');
+            });
+
+            document.getElementById('settingsBtn')?.addEventListener('click', function() {
+                alert('⚙️ تنظیمات');
+                document.getElementById('userDropdown').classList.remove('show');
+            });
+
+            document.getElementById('userMenu')?.addEventListener('click', function(e) {
+                e.stopPropagation();
+                document.getElementById('userDropdown').classList.toggle('show');
+            });
+            document.addEventListener('click', function() {
+                document.getElementById('userDropdown').classList.remove('show');
+            });
+
+            updateUI();
+        });
+
+        document.getElementById('forgotForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value.trim();
+            if (!email) {
+                alert('❌ لطفاً ایمیلت رو وارد کن!');
+                return;
+            }
+            if (users[email]) {
+                document.getElementById('forgotMsg').style.display = 'block';
+                setTimeout(() => document.getElementById('forgotMsg').style.display = 'none', 4000);
+                alert('📧 لینک بازیابی به ' + email + ' فرستاده شد!');
+                document.getElementById('forgotEmail').value = '';
+            } else {
+                document.getElementById('forgotError').style.display = 'block';
+                setTimeout(() => document.getElementById('forgotError').style.display = 'none', 3000);
+            }
+        });
+    </script>
 </body>
 </html>
