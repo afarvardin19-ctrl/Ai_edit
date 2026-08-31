@@ -25,7 +25,7 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-    print("✅ دیتابیس ساخته شد")
+    print("✅ دیتابیس با رمز ساخته شد")
 
 init_db()
 
@@ -63,34 +63,39 @@ def register():
 @app.route('/database')
 def view_database():
     conn = get_db()
-    users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
+    users = conn.execute('SELECT id, name, family, nationalCode, phone, email, password, registerDate FROM users ORDER BY id DESC').fetchall()
     conn.close()
     
     html = '''
     <!DOCTYPE html>
     <html>
-    <head><meta charset="UTF-8"><title>دیتابیس</title>
-    <style>
-        body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
-        .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
-        h1{color:#333;border-bottom:3px solid #667eea;padding-bottom:10px;}
-        .back-btn{display:inline-block;background:#667eea;color:white;padding:8px 16px;border-radius:6px;text-decoration:none;margin:10px 0;}
-        .back-btn:hover{background:#764ba2;}
-        .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
-        table{width:100%;border-collapse:collapse;margin-top:10px;}
-        th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
-        td{padding:10px;border:1px solid #ddd;text-align:center;}
-        tr:nth-child(even){background:#f8f9fa;}
-        tr:hover{background:#e8f0fe;}
-        .empty{text-align:center;color:#999;padding:20px;}
-    </style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>دیتابیس</title>
+        <style>
+            *{margin:0;padding:0;box-sizing:border-box;}
+            body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
+            .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+            h1{color:#333;border-bottom:3px solid #667eea;padding-bottom:10px;margin-bottom:20px;text-align:center;}
+            .back-btn{display:inline-block;background:#667eea;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;margin-bottom:20px;}
+            .back-btn:hover{background:#764ba2;}
+            .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;margin-bottom:15px;}
+            .table-wrap{overflow-x:auto;}
+            table{width:100%;border-collapse:collapse;margin-top:10px;}
+            th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
+            td{padding:10px;border:1px solid #ddd;text-align:center;}
+            tr:nth-child(even){background:#f8f9fa;}
+            tr:hover{background:#e8f0fe;}
+            .empty{text-align:center;color:#999;padding:20px;}
+        </style>
     </head>
     <body>
     <div class="box">
-        <h1>📊 دیتابیس</h1>
-        <a href="/" class="back-btn">← بازگشت</a><br><br>
-        <span class="count">تعداد: ''' + str(len(users)) + ''' نفر</span><br><br>
-        <div style="overflow-x:auto;">
+        <h1>📊 دیتابیس کاربران</h1>
+        <a href="/" class="back-btn">← بازگشت به صفحه اصلی</a><br><br>
+        <span class="count">تعداد کاربران: ''' + str(len(users)) + ''' نفر</span><br><br>
+        <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
@@ -98,10 +103,10 @@ def view_database():
                         <th>نام</th>
                         <th>نام خانوادگی</th>
                         <th>کد ملی</th>
-                        <th>شماره</th>
+                        <th>شماره تماس</th>
                         <th>ایمیل</th>
-                        <th>رمز</th>
-                        <th>تاریخ</th>
+                        <th>رمز عبور</th>
+                        <th>تاریخ ثبت</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -122,7 +127,7 @@ def view_database():
                     </tr>
             '''
     else:
-        html += '<tr><td colspan="8" class="empty">📭 خالی</td></tr>'
+        html += '<tr><td colspan="8" class="empty">📭 دیتابیس خالی است</td></tr>'
     
     html += '''
                 </tbody>
