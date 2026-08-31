@@ -38,6 +38,10 @@ init_db()
 def index():
     return send_from_directory('.', 'index.html')
 
+@app.route('/db')
+def database_page():
+    return send_from_directory('.', 'db.html')
+
 @app.route('/export')
 def export():
     conn = get_db()
@@ -75,8 +79,8 @@ def register():
         return jsonify({'message': '❌ خطا: ' + str(e)})
 
 @app.route('/database')
-def view_database():
-    return send_from_directory('.', 'index.html')
+def database():
+    return send_from_directory('.', 'db.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
