@@ -69,35 +69,42 @@ def view_database():
     html = '''
     <!DOCTYPE html>
     <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>دیتابیس</title>
-        <style>
-            body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
-            .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;}
-            table{width:100%;border-collapse:collapse;margin-top:10px;}
-            th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
-            td{padding:10px;border:1px solid #ddd;text-align:center;}
-            tr:nth-child(even){background:#f8f9fa;}
-            .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
-        </style>
+    <head><meta charset="UTF-8"><title>دیتابیس</title>
+    <style>
+        body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
+        .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+        h1{color:#333;border-bottom:3px solid #667eea;padding-bottom:10px;}
+        .back-btn{display:inline-block;background:#667eea;color:white;padding:8px 16px;border-radius:6px;text-decoration:none;margin:10px 0;}
+        .back-btn:hover{background:#764ba2;}
+        .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
+        table{width:100%;border-collapse:collapse;margin-top:10px;}
+        th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
+        td{padding:10px;border:1px solid #ddd;text-align:center;}
+        tr:nth-child(even){background:#f8f9fa;}
+        tr:hover{background:#e8f0fe;}
+        .empty{text-align:center;color:#999;padding:20px;}
+    </style>
     </head>
     <body>
     <div class="box">
         <h1>📊 دیتابیس</h1>
-        <a href="/">← بازگشت</a><br><br>
+        <a href="/" class="back-btn">← بازگشت</a><br><br>
         <span class="count">تعداد: ''' + str(len(users)) + ''' نفر</span><br><br>
-        <table>
-            <tr>
-                <th>ردیف</th>
-                <th>نام</th>
-                <th>نام خانوادگی</th>
-                <th>کد ملی</th>
-                <th>شماره</th>
-                <th>ایمیل</th>
-                <th>رمز</th>
-                <th>تاریخ</th>
-            </tr>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ردیف</th>
+                        <th>نام</th>
+                        <th>نام خانوادگی</th>
+                        <th>کد ملی</th>
+                        <th>شماره</th>
+                        <th>ایمیل</th>
+                        <th>رمز</th>
+                        <th>تاریخ</th>
+                    </tr>
+                </thead>
+                <tbody>
     '''
     
     if users:
@@ -115,9 +122,16 @@ def view_database():
                     </tr>
             '''
     else:
-        html += '<tr><td colspan="8">📭 خالی</td></tr>'
+        html += '<tr><td colspan="8" class="empty">📭 خالی</td></tr>'
     
-    html += '</table></div></body></html>'''
+    html += '''
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </body>
+    </html>
+    '''
     return html
 
 if __name__ == '__main__':
