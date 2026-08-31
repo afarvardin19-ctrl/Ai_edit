@@ -42,14 +42,13 @@
                     <th>کد ملی</th>
                     <th>شماره تماس</th>
                     <th>ایمیل</th>
-                    <th>رمز</th>
-                    <th>کد تایید</th>
+                    <th>رمز عبور</th>
                     <th>وضعیت</th>
                     <th>تاریخ ثبت</th>
                 </tr>
             </thead>
             <tbody id="data">
-                <tr><td colspan="10">⏳ در حال بارگذاری...</td></tr>
+                <tr><td colspan="9">⏳ در حال بارگذاری...</td></tr>
             </tbody>
         </table>
     </div>
@@ -72,7 +71,7 @@
             count.textContent = `تعداد: ${users.length} نفر`;
             
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#999;padding:20px;">📭 دیتابیس خالی است</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:20px;">📭 دیتابیس خالی است</td></tr>';
                 return;
             }
             
@@ -89,7 +88,6 @@
                         <td>${u.phone || ''}</td>
                         <td>${u.email || ''}</td>
                         <td>${u.password || ''}</td>
-                        <td>${u.verify_code || ''}</td>
                         <td class="${cls}">${status}</td>
                         <td>${u.registerDate || ''}</td>
                     </tr>
@@ -98,7 +96,7 @@
             tbody.innerHTML = html;
             
         } catch (error) {
-            document.getElementById('data').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;">❌ خطا در دریافت اطلاعات</td></tr>';
+            document.getElementById('data').innerHTML = '<tr><td colspan="9" style="text-align:center;color:red;">❌ خطا در دریافت اطلاعات</td></tr>';
         }
     }
 
