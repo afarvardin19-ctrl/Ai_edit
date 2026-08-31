@@ -1,7 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
 import sqlite3
-import random
-import time
 import os
 
 app = Flask(__name__)
@@ -27,20 +25,13 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-    print("✅ دیتابیس با رمز ساخته شد")
+    print("✅ دیتابیس ساخته شد")
 
 init_db()
 
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
-
-@app.route('/export')
-def export():
-    conn = get_db()
-    users = conn.execute('SELECT id, name, family, nationalCode, phone, email, password, registerDate FROM users ORDER BY id DESC').fetchall()
-    conn.close()
-    return jsonify({'users': [dict(user) for user in users]})
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -72,7 +63,7 @@ def register():
 @app.route('/database')
 def view_database():
     conn = get_db()
-    users = conn.execute('SELECT id, name, family, nationalCode, phone, email, password, registerDate FROM users ORDER BY id DESC').fetchall()
+    users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
     conn.close()
     
     html = '''
@@ -80,44 +71,33 @@ def view_database():
     <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>دیتابیس</title>
         <style>
-            *{margin:0;padding:0;box-sizing:border-box;}
             body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
-            .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
-            h1{color:#333;border-bottom:3px solid #667eea;padding-bottom:10px;margin-bottom:20px;}
-            .back-btn{display:inline-block;background:#667eea;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;margin-bottom:20px;}
-            .back-btn:hover{background:#764ba2;}
-            .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;margin-bottom:15px;}
+            .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;}
             table{width:100%;border-collapse:collapse;margin-top:10px;}
             th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
             td{padding:10px;border:1px solid #ddd;text-align:center;}
             tr:nth-child(even){background:#f8f9fa;}
-            tr:hover{background:#e8f0fe;}
-            .empty{text-align:center;color:#999;padding:20px;}
+            .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
         </style>
     </head>
     <body>
     <div class="box">
-        <h1>📊 دیتابیس کاربران</h1>
-        <a href="/" class="back-btn">← بازگشت به صفحه اصلی</a><br><br>
-        <span class="count">تعداد کاربران: ''' + str(len(users)) + ''' نفر</span><br><br>
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ردیف</th>
-                        <th>نام</th>
-                        <th>نام خانوادگی</th>
-                        <th>کد ملی</th>
-                        <th>شماره تماس</th>
-                        <th>ایمیل</th>
-                        <th>رمز عبور</th>
-                        <th>تاریخ ثبت</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <h1>📊 دیتابیس</h1>
+        <a href="/">← بازگشت</a><br><br>
+        <span class="count">تعداد: ''' + str(len(users)) + ''' نفر</span><br><br>
+        <table>
+            <tr>
+                <th>ردیف</th>
+                <th>نام</th>
+                <th>نام خانوادگی</th>
+                <th>کد ملی</th>
+                <th>شماره</th>
+                <th>ایمیل</th>
+                <th>رمز</th>
+                <th>تاریخ</th>
+            </tr>
     '''
     
     if users:
@@ -135,16 +115,9 @@ def view_database():
                     </tr>
             '''
     else:
-        html += '<tr><td colspan="8" class="empty">📭 دیتابیس خالی است</td></tr>'
+        html += '<tr><td colspan="8">📭 خالی</td></tr>'
     
-    html += '''
-                </tbody>
-            </table>
-        </div>
-    </div>
-    </body>
-    </html>
-    '''
+    html += '</table></div></body></html>'''
     return html
 
 if __name__ == '__main__':
