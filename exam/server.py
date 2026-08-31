@@ -11,21 +11,22 @@ def get_db():
 
 def init_db():
     conn = get_db()
+    conn.execute('DROP TABLE IF EXISTS users')
     conn.execute('''
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            family TEXT,
-            nationalCode TEXT UNIQUE,
-            phone TEXT,
-            email TEXT UNIQUE,
-            password TEXT,
+            name TEXT NOT NULL,
+            family TEXT NOT NULL,
+            nationalCode TEXT UNIQUE NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
             registerDate DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     conn.commit()
     conn.close()
-    print("✅ دیتابیس با رمز ساخته شد")
+    print("✅ دیتابیس با جدول users ساخته شد")
 
 init_db()
 
@@ -63,7 +64,7 @@ def register():
 @app.route('/database')
 def view_database():
     conn = get_db()
-    users = conn.execute('SELECT id, name, family, nationalCode, phone, email, password, registerDate FROM users ORDER BY id DESC').fetchall()
+    users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
     conn.close()
     
     html = '''
@@ -77,11 +78,10 @@ def view_database():
             *{margin:0;padding:0;box-sizing:border-box;}
             body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
             .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
-            h1{color:#333;border-bottom:3px solid #667eea;padding-bottom:10px;margin-bottom:20px;text-align:center;}
+            h1{color:#333;border-bottom:3px solid #667eea;padding-bottom:10px;margin-bottom:20px;}
             .back-btn{display:inline-block;background:#667eea;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;margin-bottom:20px;}
             .back-btn:hover{background:#764ba2;}
             .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;margin-bottom:15px;}
-            .table-wrap{overflow-x:auto;}
             table{width:100%;border-collapse:collapse;margin-top:10px;}
             th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
             td{padding:10px;border:1px solid #ddd;text-align:center;}
@@ -95,21 +95,20 @@ def view_database():
         <h1>📊 دیتابیس کاربران</h1>
         <a href="/" class="back-btn">← بازگشت به صفحه اصلی</a><br><br>
         <span class="count">تعداد کاربران: ''' + str(len(users)) + ''' نفر</span><br><br>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ردیف</th>
-                        <th>نام</th>
-                        <th>نام خانوادگی</th>
-                        <th>کد ملی</th>
-                        <th>شماره تماس</th>
-                        <th>ایمیل</th>
-                        <th>رمز عبور</th>
-                        <th>تاریخ ثبت</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <table>
+            <thead>
+                <tr>
+                    <th>ردیف</th>
+                    <th>نام</th>
+                    <th>نام خانوادگی</th>
+                    <th>کد ملی</th>
+                    <th>شماره تماس</th>
+                    <th>ایمیل</th>
+                    <th>رمز عبور</th>
+                    <th>تاریخ ثبت</th>
+                </tr>
+            </thead>
+            <tbody>
     '''
     
     if users:
@@ -130,9 +129,8 @@ def view_database():
         html += '<tr><td colspan="8" class="empty">📭 دیتابیس خالی است</td></tr>'
     
     html += '''
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
     </body>
     </html>
