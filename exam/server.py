@@ -26,7 +26,7 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-    print("✅ دیتابیس با رمز ساخته شد")
+    print("✅ دیتابیس جدید با رمز ساخته شد")
 
 init_db()
 
