@@ -15,12 +15,12 @@ def init_db():
     conn.execute('''
         CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            family TEXT,
-            nationalCode TEXT UNIQUE,
-            phone TEXT,
-            email TEXT UNIQUE,
-            password TEXT,
+            name TEXT NOT NULL,
+            family TEXT NOT NULL,
+            nationalCode TEXT UNIQUE NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
             registerDate DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
