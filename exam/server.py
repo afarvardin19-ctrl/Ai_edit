@@ -76,70 +76,8 @@ def register():
 
 @app.route('/database')
 def view_database():
-    conn = get_db()
-    users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
-    conn.close()
-    
-    html = '''
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="UTF-8"><title>دیتابیس رندر</title>
-    <style>
-        body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
-        .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;}
-        table{width:100%;border-collapse:collapse;margin-top:10px;}
-        th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
-        td{padding:10px;border:1px solid #ddd;text-align:center;}
-        tr:nth-child(even){background:#f8f9fa;}
-        .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
-        .verified{color:green;font-weight:bold;}
-        .not-verified{color:orange;font-weight:bold;}
-    </style>
-    </head>
-    <body>
-    <div class="box">
-        <h1>📊 دیتابیس رندر</h1>
-        <a href="/">← بازگشت</a><br><br>
-        <span class="count">تعداد: ''' + str(len(users)) + ''' نفر</span><br><br>
-        <table>
-            <tr>
-                <th>ردیف</th>
-                <th>نام</th>
-                <th>نام خانوادگی</th>
-                <th>کد ملی</th>
-                <th>شماره</th>
-                <th>ایمیل</th>
-                <th>رمز</th>
-                <th>کد تایید</th>
-                <th>وضعیت</th>
-                <th>تاریخ</th>
-            </tr>
-    '''
-    
-    if users:
-        for i, u in enumerate(users, 1):
-            status = '✅ تایید' if u['is_verified'] == 1 else '⏳ در انتظار'
-            cls = 'verified' if u['is_verified'] == 1 else 'not-verified'
-            html += f'''
-                    <tr>
-                        <td>{i}</td>
-                        <td>{u['name']}</td>
-                        <td>{u['family']}</td>
-                        <td>{u['nationalCode']}</td>
-                        <td>{u['phone']}</td>
-                        <td>{u['email']}</td>
-                        <td>{u['password']}</td>
-                        <td>{u['verify_code']}</td>
-                        <td class="{cls}">{status}</td>
-                        <td>{u['registerDate']}</td>
-                    </tr>
-            '''
-    else:
-        html += '<tr><td colspan="10">📭 دیتابیس خالی است</td></tr>'
-    
-    html += '</table></div></body></html>'''
-    return html
+    return send_from_directory('.', 'index.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=False)
