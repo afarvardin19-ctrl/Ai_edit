@@ -27,7 +27,7 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-    print("✅ دیتابیس بر اساس فرم ساخته شد")
+    print("✅ دیتابیس با رمز ساخته شد")
 
 init_db()
 
@@ -38,7 +38,7 @@ def index():
 @app.route('/export')
 def export():
     conn = get_db()
-    users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
+    users = conn.execute('SELECT id, name, family, nationalCode, phone, email, password, registerDate FROM users ORDER BY id DESC').fetchall()
     conn.close()
     return jsonify({'users': [dict(user) for user in users]})
 
@@ -63,7 +63,7 @@ def register():
         ''', (name, family, nationalCode, phone, email, password))
         conn.commit()
         conn.close()
-        return jsonify({'message': '✅ ثبت نام با موفقیت انجام شد!'})
+        return jsonify({'message': '✅ ثبت نام موفق!'})
     except sqlite3.IntegrityError:
         return jsonify({'message': '❌ کد ملی یا ایمیل تکراری است'})
     except Exception as e:
@@ -72,7 +72,7 @@ def register():
 @app.route('/database')
 def view_database():
     conn = get_db()
-    users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
+    users = conn.execute('SELECT id, name, family, nationalCode, phone, email, password, registerDate FROM users ORDER BY id DESC').fetchall()
     conn.close()
     
     html = '''
