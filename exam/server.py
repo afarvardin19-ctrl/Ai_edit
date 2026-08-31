@@ -22,15 +22,12 @@ def init_db():
             phone TEXT,
             email TEXT UNIQUE,
             password TEXT,
-            verify_code TEXT,
-            code_time INTEGER,
-            is_verified INTEGER DEFAULT 0,
             registerDate DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     conn.commit()
     conn.close()
-    print("✅ دیتابیس آماده شد")
+    print("✅ دیتابیس بر اساس فرم ساخته شد")
 
 init_db()
 
@@ -43,13 +40,7 @@ def export():
     conn = get_db()
     users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
     conn.close()
-    # حذف verify_code از خروجی
-    result = []
-    for user in users:
-        user_dict = dict(user)
-        user_dict.pop('verify_code', None)  # حذف کد تایید
-        result.append(user_dict)
-    return jsonify({'users': result})
+    return jsonify({'users': [dict(user) for user in users]})
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -64,17 +55,15 @@ def register():
     if not all([name, family, nationalCode, phone, email, password]):
         return jsonify({'message': '❌ همه فیلدها الزامی است'})
     
-    verify_code = str(random.randint(100000, 999999))
-    
     try:
         conn = get_db()
         conn.execute('''
-            INSERT INTO users (name, family, nationalCode, phone, email, password, verify_code, code_time)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (name, family, nationalCode, phone, email, password, verify_code, int(time.time())))
+            INSERT INTO users (name, family, nationalCode, phone, email, password)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (name, family, nationalCode, phone, email, password))
         conn.commit()
         conn.close()
-        return jsonify({'message': '✅ ثبت نام موفق! کد: ' + verify_code})
+        return jsonify({'message': '✅ ثبت نام با موفقیت انجام شد!'})
     except sqlite3.IntegrityError:
         return jsonify({'message': '❌ کد ملی یا ایمیل تکراری است'})
     except Exception as e:
@@ -89,41 +78,50 @@ def view_database():
     html = '''
     <!DOCTYPE html>
     <html>
-    <head><meta charset="UTF-8"><title>دیتابیس</title>
-    <style>
-        body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
-        .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;}
-        table{width:100%;border-collapse:collapse;margin-top:10px;}
-        th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
-        td{padding:10px;border:1px solid #ddd;text-align:center;}
-        tr:nth-child(even){background:#f8f9fa;}
-        .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
-        .verified{color:green;font-weight:bold;}
-        .not-verified{color:orange;font-weight:bold;}
-    </style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>دیتابیس</title>
+        <style>
+            *{margin:0;padding:0;box-sizing:border-box;}
+            body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
+            .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+            h1{color:#333;border-bottom:3px solid #667eea;padding-bottom:10px;margin-bottom:20px;}
+            .back-btn{display:inline-block;background:#667eea;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;margin-bottom:20px;}
+            .back-btn:hover{background:#764ba2;}
+            .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;margin-bottom:15px;}
+            table{width:100%;border-collapse:collapse;margin-top:10px;}
+            th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
+            td{padding:10px;border:1px solid #ddd;text-align:center;}
+            tr:nth-child(even){background:#f8f9fa;}
+            tr:hover{background:#e8f0fe;}
+            .empty{text-align:center;color:#999;padding:20px;}
+        </style>
     </head>
     <body>
     <div class="box">
-        <h1>📊 دیتابیس</h1>
-        <a href="/">← بازگشت</a><br><br>
-        <span class="count">تعداد: ''' + str(len(users)) + ''' نفر</span><br><br>
-        <table>
-            <tr>
-                <th>ردیف</th>
-                <th>نام</th>
-                <th>نام خانوادگی</th>
-                <th>کد ملی</th>
-                <th>شماره</th>
-                <th>ایمیل</th>
-                <th>رمز</th>
-                <th>وضعیت</th>
-            </tr>
+        <h1>📊 دیتابیس کاربران</h1>
+        <a href="/" class="back-btn">← بازگشت به صفحه اصلی</a><br><br>
+        <span class="count">تعداد کاربران: ''' + str(len(users)) + ''' نفر</span><br><br>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ردیف</th>
+                        <th>نام</th>
+                        <th>نام خانوادگی</th>
+                        <th>کد ملی</th>
+                        <th>شماره تماس</th>
+                        <th>ایمیل</th>
+                        <th>رمز عبور</th>
+                        <th>تاریخ ثبت</th>
+                    </tr>
+                </thead>
+                <tbody>
     '''
     
     if users:
         for i, u in enumerate(users, 1):
-            status = '✅ تایید' if u['is_verified'] == 1 else '⏳ در انتظار'
-            cls = 'verified' if u['is_verified'] == 1 else 'not-verified'
             html += f'''
                     <tr>
                         <td>{i}</td>
@@ -133,13 +131,20 @@ def view_database():
                         <td>{u['phone']}</td>
                         <td>{u['email']}</td>
                         <td>{u['password']}</td>
-                        <td class="{cls}">{status}</td>
+                        <td>{u['registerDate']}</td>
                     </tr>
             '''
     else:
-        html += '<tr><td colspan="8">📭 دیتابیس خالی است</td></tr>'
+        html += '<tr><td colspan="8" class="empty">📭 دیتابیس خالی است</td></tr>'
     
-    html += '</table></div></body></html>'''
+    html += '''
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </body>
+    </html>
+    '''
     return html
 
 if __name__ == '__main__':

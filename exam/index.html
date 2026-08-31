@@ -1,107 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>دیتابیس لحظه‌ای</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت نام</title>
     <style>
-        body{font-family:Tahoma;background:#f0f2f5;padding:20px;}
-        .box{max-width:1200px;margin:auto;background:white;border-radius:12px;padding:30px;}
-        table{width:100%;border-collapse:collapse;margin-top:10px;}
-        th{background:#667eea;color:white;padding:12px;border:1px solid #667eea;}
-        td{padding:10px;border:1px solid #ddd;text-align:center;}
-        tr:nth-child(even){background:#f8f9fa;}
-        .count{background:#667eea;color:white;padding:5px 15px;border-radius:20px;display:inline-block;}
-        .verified{color:green;font-weight:bold;}
-        .not-verified{color:orange;font-weight:bold;}
-        .status-bar{background:#e8f0fe;padding:10px;border-radius:8px;margin-bottom:15px;}
-        .live{color:green;font-weight:bold;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:Tahoma;background:#f0f2f5;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
+        .container{max-width:450px;width:100%;background:#fff;border-radius:16px;padding:35px 30px;box-shadow:0 8px 40px rgba(0,0,0,0.08);border:1px solid #e8ecf0;}
+        h1{text-align:center;color:#1a1a2e;border-bottom:3px solid #4a6cf7;padding-bottom:12px;margin-bottom:25px;}
+        .form-group{margin-bottom:15px;}
+        label{display:block;color:#374151;font-size:13px;font-weight:600;margin-bottom:5px;}
+        input{width:100%;padding:11px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:15px;transition:0.2s;background:#fafbfc;}
+        input:focus{outline:none;border-color:#4a6cf7;box-shadow:0 0 0 4px rgba(74,108,247,0.1);background:#fff;}
+        .btn{width:100%;padding:13px;background:#4a6cf7;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:0.25s;margin-top:8px;}
+        .btn:hover{background:#3b5de7;transform:translateY(-1px);box-shadow:0 4px 16px rgba(74,108,247,0.3);}
+        .message{margin-top:15px;padding:12px 16px;border-radius:10px;font-size:14px;display:none;}
+        .message.success{background:#ecfdf5;color:#065f46;display:block;border:1px solid #a7f3d0;}
+        .message.error{background:#fef2f2;color:#991b1b;display:block;border:1px solid #fca5a5;}
+        .footer{text-align:center;font-size:12px;color:#9ca3af;margin-top:16px;}
+        .db-link{display:block;text-align:center;margin-top:10px;color:#4a6cf7;text-decoration:none;font-size:14px;}
+        .db-link:hover{text-decoration:underline;}
     </style>
 </head>
 <body>
-<div class="box">
-    <h1>📊 دیتابیس لحظه‌ای</h1>
-    <div class="status-bar">
-        <span class="live">● زنده</span> | 
-        آپدیت هر ۱ ثانیه | 
-        <span id="time">...</span>
-    </div>
-    <a href="/">← بازگشت</a><br><br>
-    <span class="count" id="count">تعداد: ۰ نفر</span><br><br>
-    <table>
-        <thead>
-            <tr>
-                <th>ردیف</th>
-                <th>نام</th>
-                <th>نام خانوادگی</th>
-                <th>کد ملی</th>
-                <th>شماره</th>
-                <th>ایمیل</th>
-                <th>رمز</th>
-                <th>کد تایید</th>
-                <th>وضعیت</th>
-                <th>تاریخ</th>
-            </tr>
-        </thead>
-        <tbody id="data">
-            <tr><td colspan="10">⏳ در حال بارگذاری...</td></tr>
-        </tbody>
-    </table>
+<div class="container">
+    <h1>📝 ثبت نام</h1>
+    <form id="registerForm">
+        <div class="form-group">
+            <label>نام</label>
+            <input type="text" id="name" placeholder="نام" required>
+        </div>
+        <div class="form-group">
+            <label>نام خانوادگی</label>
+            <input type="text" id="family" placeholder="نام خانوادگی" required>
+        </div>
+        <div class="form-group">
+            <label>کد ملی</label>
+            <input type="text" id="nationalCode" placeholder="کد ملی" required>
+        </div>
+        <div class="form-group">
+            <label>شماره تماس</label>
+            <input type="tel" id="phone" placeholder="شماره تماس" required>
+        </div>
+        <div class="form-group">
+            <label>ایمیل</label>
+            <input type="email" id="email" placeholder="ایمیل" required>
+        </div>
+        <div class="form-group">
+            <label>رمز عبور</label>
+            <input type="password" id="password" placeholder="رمز عبور" required>
+        </div>
+        <button type="submit" class="btn">ثبت نام</button>
+    </form>
+    <div id="message" class="message"></div>
+    <a href="/database" class="db-link">📊 مشاهده دیتابیس</a>
+    <div class="footer">کلیه حقوق محفوظ است © ۱۴۰۴</div>
 </div>
 
 <script>
-    function updateTime() {
-        document.getElementById('time').textContent = new Date().toLocaleTimeString('fa-IR');
-    }
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const data = {
+            name: document.getElementById('name').value,
+            family: document.getElementById('family').value,
+            nationalCode: document.getElementById('nationalCode').value,
+            phone: document.getElementById('phone').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
 
-    async function fetchData() {
+        const msg = document.getElementById('message');
+        
         try {
-            const response = await fetch('/export');
-            const result = await response.json();
-            const users = result.users || [];
-            
-            const tbody = document.getElementById('data');
-            const count = document.getElementById('count');
-            
-            count.textContent = `تعداد: ${users.length} نفر`;
-            
-            if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10">📭 دیتابیس خالی است</td></tr>';
-                return;
-            }
-            
-            let html = '';
-            users.forEach((u, i) => {
-                const status = u.is_verified === 1 ? '✅ تایید' : '⏳ در انتظار';
-                const cls = u.is_verified === 1 ? 'verified' : 'not-verified';
-                html += `
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td>${u.name || ''}</td>
-                        <td>${u.family || ''}</td>
-                        <td>${u.nationalCode || ''}</td>
-                        <td>${u.phone || ''}</td>
-                        <td>${u.email || ''}</td>
-                        <td>${u.password || ''}</td>
-                        <td>${u.verify_code || ''}</td>
-                        <td class="${cls}">${status}</td>
-                        <td>${u.registerDate || ''}</td>
-                    </tr>
-                `;
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
             });
-            tbody.innerHTML = html;
+            const result = await response.json();
             
+            if (result.message.includes('موفق')) {
+                msg.className = 'message success';
+                msg.textContent = '✅ ' + result.message;
+                document.getElementById('registerForm').reset();
+            } else {
+                msg.className = 'message error';
+                msg.textContent = '❌ ' + result.message;
+            }
         } catch (error) {
-            document.getElementById('data').innerHTML = '<tr><td colspan="10">❌ خطا در دریافت</td></tr>';
+            msg.className = 'message error';
+            msg.textContent = '❌ خطا در ارتباط با سرور';
         }
-    }
-
-    // آپدیت هر ۱ ثانیه
-    updateTime();
-    fetchData();
-    setInterval(() => {
-        updateTime();
-        fetchData();
-    }, 1000);
+    });
 </script>
 </body>
 </html>
