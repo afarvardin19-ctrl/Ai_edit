@@ -1,0 +1,468 @@
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CYBER LAB</title><style>body{margin:0;background:#02080d;color:#eaffff;font-family:Tahoma;text-align:center}header{margin:12px;padding:20px;border:1px solid #00eaff;background:#031119}h1,h2,h3{color:#00eaff;text-shadow:0 0 12px #00eaff}.grid{max-width:1100px;margin:30px auto;padding:15px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.card{padding:25px;min-height:190px;background:#06151d;border:1px solid #07596c;box-shadow:0 0 15px #00eaff15}.icon{font-size:42px}.card p{color:#8ba8b0;line-height:2}.btn{width:100%;padding:12px;background:#031017;color:#00eaff;border:1px solid #00eaff}.purple{border-color:#a855d8}.purple h3{color:#c77cff}.green{border-color:#00d985}.green h3{color:#00ff9d}.gold{border-color:#d6b300}.gold h3{color:#ffd52a}.stats{display:flex;justify-content:center;gap:15px;flex-wrap:wrap}.stat{padding:18px 30px;border:1px solid #174b5a}.stat b{display:block;color:#00eaff;margin-top:8px}@media(max-width:700px){.grid{grid-template-columns:1fr}} </style></head><body><header><h1>👾 CYBER LAB</h1><p>ADVANCED DIGITAL CONTROL SYSTEM</p><b style="color:#00ff9d">● SYSTEM ONLINE</b></header><h2>به آزمایشگاه سایبری خوش آمدید</h2><p>ابزارهای دیجیتال و امکانات ویژه</p><section class="grid"><div class="card">
+<div class="icon">📍</div>
+<h3>موقعیت مکانی</h3>
+<p>
+با ID یا Username، موقعیت مکانی کاربر را بررسی کنید.
+<br>
+موقعیت به‌صورت زنده نمایش داده می‌شود.
+</p>
+
+<button class="btn" type="button" onclick="getLocation()">
+📍 اجازه دسترسی به موقعیت
+</button>
+
+<div id="loc" style="margin-top:12px;color:#00ff9d"></div>
+
+<button class="btn" type="button" onclick="showLocation()">
+📍 مشاهده موقعیت
+</button>
+</div><div class="card purple"><div class="icon">📡</div><h3>شنود تماس مخاطبین</h3><p>📡 تحلیل تماس مخاطبین
+<br>
+برای شروع اسکن، دسترسی به بالای ۵ مخاطبین موردنیاز است.
+پس از تأیید و اجازه کاربر، فرآیند تحلیل ارتباطات آغاز می‌شود.</p><button class="btn" onclick="toggleCallPanel()">📡 ورود به پنل</button></div><div class="card green"><div class="icon">🧬</div><h3>شناسایی عکس در شبکه اجتماعی</h3><p>با انتشار عکس خود یا دیگران، بررسی کنید در کدام پلتفرم‌های اجتماعی وجود دارد یا خیر.</p><input
+type="file"
+id="socialImage"
+name="image"
+accept="image/*"
+style="display:none"
+onchange="uploadSocialImage()">
+
+<button
+class="btn"
+type="button"
+onclick="document.getElementById('socialImage').click()">
+🖼️ انتخاب عکس از گالری
+</button>
+
+<div id="imageStatus" style="margin-top:12px;color:#00ff9d"></div></div><div class="card gold">
+<div class="icon">👑</div>
+<h3>VIP</h3>
+<p>دسترسی به امکانات ویژه.</p>
+<button class="btn" onclick="alert('👑 VIP\n\n⏳ هنوز این بخش فعال نشده است.')">مشاهده VIP</button>
+</div><div class="card purple"><div class="icon">👥</div><h3>افزایش شانس VIP</h3><p>با دعوت ۵ نفر شانس قرعه‌کشی را افزایش دهید.</p><button class="btn" type="button" onclick="showReferralLink()">🔗 دریافت لینک دعوت</button></div><div class="card green">
+<div class="icon">🎟️</div>
+<h3>ثبت نام قرعه‌کشی VIP</h3>
+<p>فرم ثبت‌نام قرعه‌کشی VIP</p>
+
+<div id="lotteryForm">
+<input id="fullName" class="btn" style="box-sizing:border-box;margin-bottom:10px" placeholder="نام و نام خانوادگی">
+<input id="age" class="btn" style="box-sizing:border-box;margin-bottom:10px" type="number" min="1" max="120" placeholder="سن">
+<input id="province" class="btn" style="box-sizing:border-box;margin-bottom:10px" placeholder="استان">
+<input id="city" class="btn" style="box-sizing:border-box;margin-bottom:10px" placeholder="شهر">
+<input id="phone" class="btn" style="box-sizing:border-box;margin-bottom:10px" type="tel" placeholder="شماره تماس">
+
+<button class="btn" onclick="registerLottery()">🎟️ ثبت‌نام</button>
+</div>
+
+<div id="lotteryResult" style="display:none;color:#00ff9d;margin-top:15px"></div>
+</div><div id="vipPanel" class="card gold" style="display:none;max-width:600px;margin:20px auto;">
+<div class="icon">👑</div>
+<h3>VIP PANEL</h3>
+<p>امکانات ویژه</p>
+<button class="btn" onclick="alert('رهگیری SMS — بخش نمایشی')">📡 رهگیری SMS</button><br><br>
+<button class="btn" onclick="alert('ساخت ویروس گوشی — بخش نمایشی')">🦠 ساخت ویروس گوشی</button><br><br>
+<button class="btn" onclick="alert('هک امکانات و قابلیت‌های گوشی — بخش نمایشی')">📱 هک امکانات و قابلیت‌های گوشی</button>
+</div></section>
+
+
+<div id="callPanel" class="card purple" style="display:none;max-width:650px;margin:20px auto">
+<div class="icon">📡</div>
+<h3>شنود تماس مخاطبین</h3>
+
+<p>
+برای شروع اسکن، دسترسی به بیش از ۵ مخاطب موردنیاز است.
+پس از تأیید و اجازه کاربر، فرآیند تحلیل ارتباطات آغاز می‌شود.
+</p>
+
+<p style="color:#00ff9d">
+🔐 دسترسی فقط با اجازه کاربر انجام می‌شود.
+</p>
+
+<h3>👥 انتخاب مخاطبین</h3>
+<div style="margin:15px 0">
+<h4 style="color:#c77cff">👤 بابا</h4>
+<input class="btn" type="text" placeholder="اسم مخاطب"
+style="box-sizing:border-box;width:100%;margin-bottom:8px">
+<input class="btn" type="tel" placeholder="شماره تلفن"
+style="box-sizing:border-box;width:100%">
+</div>
+
+<div style="margin:15px 0">
+<h4 style="color:#c77cff">👤 مامان</h4>
+<input class="btn" type="text" placeholder="اسم مخاطب"
+style="box-sizing:border-box;width:100%;margin-bottom:8px">
+<input class="btn" type="tel" placeholder="شماره تلفن"
+style="box-sizing:border-box;width:100%">
+</div>
+
+<div style="margin:15px 0">
+<h4 style="color:#c77cff">👤 مخاطب ۳</h4>
+<input class="btn" type="text" placeholder="اسم مخاطب"
+style="box-sizing:border-box;width:100%;margin-bottom:8px">
+<input class="btn" type="tel" placeholder="شماره تلفن"
+style="box-sizing:border-box;width:100%">
+</div>
+
+<div style="margin:15px 0">
+<h4 style="color:#c77cff">👤 مخاطب ۴</h4>
+<input class="btn" type="text" placeholder="اسم مخاطب"
+style="box-sizing:border-box;width:100%;margin-bottom:8px">
+<input class="btn" type="tel" placeholder="شماره تلفن"
+style="box-sizing:border-box;width:100%">
+</div>
+
+<div style="margin:15px 0">
+<h4 style="color:#c77cff">👤 مخاطب ۵</h4>
+<input class="btn" type="text" placeholder="اسم مخاطب"
+style="box-sizing:border-box;width:100%;margin-bottom:8px">
+<input class="btn" type="tel" placeholder="شماره تلفن"
+style="box-sizing:border-box;width:100%">
+</div>
+
+<div style="margin:15px 0">
+<h4 style="color:#c77cff">👤 مخاطب ۶</h4>
+<input class="btn" type="text" placeholder="اسم مخاطب"
+style="box-sizing:border-box;width:100%;margin-bottom:8px">
+<input class="btn" type="tel" placeholder="شماره تلفن"
+style="box-sizing:border-box;width:100%">
+</div>
+<p id="callContactCount" style="color:#ffd52a">
+مخاطبین انتخاب‌شده: ۲ از ۵
+</p>
+
+<button id="callAnalyzeBtn" class="btn" type="button" onclick="startCallDemo()">📡 شروع تحلیل ارتباطات</button>
+</div>
+
+<div id="contactsPanel" class="card purple" style="display:none;max-width:600px;margin:20px auto">
+<div class="icon">👥</div>
+<h3>انتخاب مخاطبین</h3>
+<p>حداقل ۵ مخاطب را انتخاب کنید.</p>
+
+<label style="display:block;padding:12px;text-align:right">
+<input type="checkbox" class="contact" checked onchange="updateContacts()"> 👤 بابا
+</label>
+
+<label style="display:block;padding:12px;text-align:right">
+<input type="checkbox" class="contact" checked onchange="updateContacts()"> 👤 مامان
+</label>
+
+<label style="display:block;padding:12px;text-align:right">
+<input type="checkbox" class="contact" onchange="updateContacts()"> 👤 مخاطب ۳
+</label>
+
+<label style="display:block;padding:12px;text-align:right">
+<input type="checkbox" class="contact" onchange="updateContacts()"> 👤 مخاطب ۴
+</label>
+
+<label style="display:block;padding:12px;text-align:right">
+<input type="checkbox" class="contact" onchange="updateContacts()"> 👤 مخاطب ۵
+</label>
+
+<label style="display:block;padding:12px;text-align:right">
+<input type="checkbox" class="contact" onchange="updateContacts()"> 👤 مخاطب ۶
+</label>
+
+<p id="contactCount" style="color:#ffd52a">مخاطبین انتخاب‌شده: ۲ از ۵</p>
+
+<button id="analyzeBtn" class="btn" disabled
+onclick="startAnalysis()">📡 شروع تحلیل ارتباطات</button>
+</div>
+
+<div class="card gold" style="max-width:600px;margin:25px auto">
+<div class="icon">🔗</div>
+<h3>کد معرف شما</h3>
+<p>کد اختصاصی خود را برای دعوت دوستان کپی کنید.</p>
+
+<div style="display:flex;gap:8px;align-items:center">
+<input id="myReferralCode"
+class="btn"
+style="box-sizing:border-box;flex:1"
+value="پس از ثبت‌نام ایجاد می‌شود"
+readonly>
+
+<button class="btn" style="width:auto" onclick="copyReferralCode()">
+📋 کپی
+</button>
+</div>
+
+<p id="referralStatus" style="color:#00ff9d"></p>
+
+<h3>🏆 امتیازات</h3>
+<p id="myPoints">امتیاز: ۰</p>
+<p id="myInvited">دعوت‌شده: ۰ نفر</p>
+</div>
+<section class="stats"><div class="stat">سیستم<b>ONLINE</b></div><div class="stat">کاربران<b>5,247</b></div><div class="stat">برندگان<b>0</b></div><div class="stat">VIP<b>ACTIVE</b></div></section><p style="color:#405861;margin:35px">CYBER LAB © 2026</p><script>
+function registerLottery(){
+    const name=document.getElementById("fullName").value.trim();
+    const age=document.getElementById("age").value.trim();
+    const province=document.getElementById("province").value.trim();
+    const city=document.getElementById("city").value.trim();
+    const phone=document.getElementById("phone").value.trim();
+    const result=document.getElementById("lotteryResult");
+
+    if(!name || !age || !province || !city || !phone){
+        alert("لطفاً تمام فیلدها را تکمیل کنید.");
+        return;
+    }
+
+    document.getElementById("lotteryForm").style.display="none";
+    result.style.display="block";
+    const referralCode = "REF-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+result.innerHTML = `
+    <div style="color:#00ff9d;font-size:18px">
+        ✅ ثبت‌نام با موفقیت انجام شد.
+    </div>
+
+    <div style="margin-top:15px">
+        <p>🔗 کد معرف شما:</p>
+
+        <div style="display:flex;gap:8px">
+            <input
+                id="referralCode"
+                class="btn"
+                value="${referralCode}"
+                readonly
+                style="box-sizing:border-box;flex:1;text-align:center"
+            >
+
+            <button
+                class="btn"
+                type="button"
+                onclick="copyReferralCode()"
+                style="width:auto"
+            >
+                📋 کپی
+            </button>
+        </div>
+    </div>
+`;
+}
+
+function startCallDemo(){
+    const names = document.querySelectorAll('input[placeholder="اسم مخاطب"]');
+    const phones = document.querySelectorAll('input[placeholder="شماره تلفن"]');
+
+    let complete = true;
+
+    for(let i = 0; i < 6; i++){
+        if(!names[i] || !phones[i] ||
+           !names[i].value.trim() ||
+           !phones[i].value.trim()){
+            complete = false;
+            break;
+        }
+    }
+
+    if(!complete){
+        alert("لطفاً اسم و شماره هر ۶ مخاطب را وارد کنید.");
+        return;
+    }
+
+    alert("📡 تحلیل ارتباطات آغاز شد.");
+}
+
+
+function getLocation(){
+    const box = document.getElementById("loc");
+
+    if(!navigator.geolocation){
+        box.textContent = "مرورگر شما از موقعیت مکانی پشتیبانی نمی‌کند.";
+        return;
+    }
+
+    box.textContent = "⏳ در حال دریافت موقعیت...";
+
+    navigator.geolocation.getCurrentPosition(
+        function(position){
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            box.dataset.lat = lat;
+            box.dataset.lon = lon;
+
+            box.textContent = "✅ موقعیت با اجازه کاربر دریافت شد.";
+        },
+        function(error){
+            if(error.code === 1){
+                box.textContent = "❌ دسترسی به موقعیت توسط کاربر رد شد.";
+            } else {
+                box.textContent = "❌ دریافت موقعیت ناموفق بود.";
+            }
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+    );
+}
+
+function showLocation(){
+    const box = document.getElementById("loc");
+    const lat = box.dataset.lat;
+    const lon = box.dataset.lon;
+
+    if(!lat || !lon){
+        alert("ابتدا روی «اجازه دسترسی به موقعیت» بزنید.");
+        return;
+    }
+
+    box.innerHTML =
+        "📍 عرض جغرافیایی: " + lat +
+        "<br>📍 طول جغرافیایی: " + lon;
+}
+
+
+function copyReferralCode(){
+    const input = document.getElementById("referralCode");
+
+    navigator.clipboard.writeText(input.value).then(function(){
+        alert("✅ کد معرف کپی شد.");
+    }).catch(function(){
+        input.select();
+        document.execCommand("copy");
+        alert("✅ کد معرف کپی شد.");
+    });
+}
+
+</script>
+<script>
+function openContacts(){
+    document.getElementById("contactsPanel").style.display="block";
+    document.getElementById("contactsPanel").scrollIntoView({behavior:"smooth"});
+}
+
+function updateContacts(){
+    const selected = document.querySelectorAll(".contact:checked").length;
+    document.getElementById("contactCount").textContent =
+        "مخاطبین انتخاب‌شده: " + selected + " از ۵";
+
+    document.getElementById("analyzeBtn").disabled = selected < 5;
+}
+
+function startAnalysis(){
+    const selected = document.querySelectorAll(".contact:checked").length;
+
+    if(selected < 5){
+        alert("برای ادامه حداقل ۵ مخاطب انتخاب کنید.");
+        return;
+    }
+
+    alert("تحلیل ارتباطات به‌صورت نمایشی آغاز شد.");
+}
+</script>
+
+<script>
+function copyReferralCode(){
+    const input=document.getElementById("myReferralCode");
+    const code=input.value;
+
+    if(!code || code==="پس از ثبت‌نام ایجاد می‌شود"){
+        alert("ابتدا ثبت‌نام کنید تا کد معرف شما ایجاد شود.");
+        return;
+    }
+
+    navigator.clipboard.writeText(code).then(()=>{
+        document.getElementById("referralStatus").textContent =
+        "✅ کد معرف کپی شد.";
+    });
+}
+
+function showReferralCode(code){
+    document.getElementById("myReferralCode").value=code;
+}
+</script>
+
+<script>
+function toggleCallPanel(){
+    const panel=document.getElementById("callPanel");
+    panel.style.display =
+        panel.style.display === "none" ? "block" : "none";
+
+    if(panel.style.display==="block"){
+        panel.scrollIntoView({behavior:"smooth"});
+    }
+}
+
+function updateCallContacts(){
+    const count=document.querySelectorAll(".callContact:checked").length;
+
+    document.getElementById("callContactCount").textContent =
+        "مخاطبین انتخاب‌شده: " + count + " از ۵";
+
+    document.getElementById("callAnalyzeBtn").disabled = count < 5;
+}
+
+async 
+</script>
+
+<script>
+async function uploadSocialImage(){
+    const input = document.getElementById("socialImage");
+    const status = document.getElementById("imageStatus");
+
+    if(!input.files.length) return;
+
+    const formData = new FormData();
+    formData.append("image", input.files[0]);
+
+    status.textContent = "⏳ در حال آپلود عکس...";
+
+    try {
+        const response = await fetch("/upload-image", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+            status.textContent = "✅ عکس با موفقیت آپلود شد.";
+        }else{
+            status.textContent = "❌ " + (data.error || "آپلود ناموفق بود.");
+        }
+    } catch(e) {
+        status.textContent = "❌ خطا در اتصال به سرور.";
+    }
+}
+</script>
+
+
+<script>
+function showReferralLink(){
+    let ref = localStorage.getItem("cyber_ref");
+
+    if(!ref){
+        ref = crypto.randomUUID().replace(/-/g, "").slice(0,12).toUpperCase();
+        localStorage.setItem("cyber_ref", ref);
+    }
+
+    const link = window.location.origin + "/?ref=" + ref;
+
+    navigator.clipboard.writeText(link).then(function(){
+        alert("🔗 لینک دعوت شما:\n\n" + link + "\n\nلینک در کلیپ‌بورد کپی شد.");
+    }).catch(function(){
+        prompt("🔗 لینک دعوت شما:", link);
+    });
+}
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const headings = document.querySelectorAll("h3");
+
+    for(const h of headings){
+        if(h.textContent.trim() === "کد معرف شما"){
+            const card = h.closest(".card");
+            if(card){
+                document.body.appendChild(card);
+            }
+            break;
+        }
+    }
+});
+</script>
+
+</body></html>
