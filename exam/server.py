@@ -47,7 +47,13 @@ def export():
     conn = get_db()
     users = conn.execute('SELECT * FROM users ORDER BY id DESC').fetchall()
     conn.close()
-    return jsonify({'users': [dict(user) for user in users]})
+    # حذف verify_code از خروجی
+    result = []
+    for user in users:
+        user_dict = dict(user)
+        user_dict.pop('verify_code', None)  # حذف کد تایید
+        result.append(user_dict)
+    return jsonify({'users': result})
 
 @app.route('/register', methods=['POST'])
 def register():
